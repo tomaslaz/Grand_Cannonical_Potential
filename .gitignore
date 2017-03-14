@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Eclipse Project
+.project
+
 # Distribution / packaging
 .Python
 env/
