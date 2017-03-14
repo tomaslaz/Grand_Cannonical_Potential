@@ -10,6 +10,8 @@
 from optparse import OptionParser
 #import sys
 
+from source.Utilities import log
+
 def cmd_line_args():
   """
   Handles command line arguments and options.
@@ -22,7 +24,7 @@ def cmd_line_args():
 
   parser.disable_interspersed_args()
   
-  parser.add_option('-t', dest="temps", default=None, help="List of temperatures, separated by a comma (default t=0)")
+  parser.add_option('-t', dest="temps", default=None, help="List of temperatures separated by a comma (default t=0)")
   parser.add_option("-v", dest="verbose", default=0, type="int", help="Verbose: 0 - off, 1 - on.")
   
   (options, args) = parser.parse_args()
@@ -44,6 +46,8 @@ if __name__ == "__main__":
   # command line arguments and options
   options, args = cmd_line_args()
   
+  log(__name__, "Grand Cannonical Potential", options.verbose)
+  
   main(options, args)
   
-  print "Finished."
+  log(__name__, "Finished.", options.verbose)
