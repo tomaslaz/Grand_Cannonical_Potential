@@ -10,6 +10,7 @@
 from optparse import OptionParser
 #import sys
 
+import source.IO as IO
 from source.Utilities import log
 
 def cmd_line_args():
@@ -18,7 +19,7 @@ def cmd_line_args():
   
   """
   
-  usage = "usage: %prog"
+  usage = "usage: %prog input_data"
   
   parser = OptionParser(usage=usage)
 
@@ -36,11 +37,13 @@ def cmd_line_args():
 
 def main(options, args):
   """
+  The main routine.
   
   """
   
-  print ""
-
+  # reading in the data
+  success, error, data = IO.read_data(args[0])
+  
 if __name__ == "__main__":
   
   # command line arguments and options
@@ -48,6 +51,8 @@ if __name__ == "__main__":
   
   log(__name__, "Grand Cannonical Potential", options.verbose)
   
+  # the main routine
   main(options, args)
   
   log(__name__, "Finished.", options.verbose)
+  
