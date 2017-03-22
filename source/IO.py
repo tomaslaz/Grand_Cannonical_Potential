@@ -29,6 +29,6 @@ def read_data(file_path):
     error = "File: %s cannot be found." % (file_path)
   
   else:
-    energies_data = np.loadtxt(file_path, skiprows=1, delimiter=',', unpack=True)
-  
+    energies_data = np.loadtxt(file_path, skiprows=2, delimiter=',', unpack=True)
+    
   return success, error, energies_data

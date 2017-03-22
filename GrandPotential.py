@@ -19,7 +19,7 @@ def cmd_line_args():
   
   """
   
-  usage = "usage: %prog input_data"
+  usage = "usage: %prog input_data.csv"
   
   parser = OptionParser(usage=usage)
 
@@ -30,7 +30,7 @@ def cmd_line_args():
   
   (options, args) = parser.parse_args()
 
-  if (len(args) != 0):
+  if (len(args) != 1):
     parser.error("incorrect number of arguments")
 
   return options, args
