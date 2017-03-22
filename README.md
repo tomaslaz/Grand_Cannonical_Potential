@@ -1,5 +1,7 @@
 # Grand_Cannonical_Potential
 
+The work is based on the methodology developed in
+
 Usage: GrandPotential.py input_data.csv
 
 Options:

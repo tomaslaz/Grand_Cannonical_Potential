@@ -44,6 +44,9 @@ def main(options, args):
   # reading in the data
   success, error, data = IO.read_data(args[0])
   
+  # grand cannonical analysis
+  
+  
 if __name__ == "__main__":
   
   # command line arguments and options
