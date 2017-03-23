@@ -7,9 +7,10 @@ Grand canonical ensemble module.
 import copy
 import numpy as np
 
+import Utilities
 from Utilities import log
 
-def perform_grand_canonical_analysis(input_data_array, temperatures, _accuracy, options):
+def perform_grand_canonical_analysis(input_data_array, _accuracy, options):
   """
   The main method of the grand canonical analysis
   
@@ -22,13 +23,19 @@ def perform_grand_canonical_analysis(input_data_array, temperatures, _accuracy, 
   name_list = []
   total_combi_list = []
   
+  # reading in the temperatures
+  success, error, temperatures = Utilities.get_list_of_temps(options.temps)
+  
+  if not success:
+    return success, error
+  
+  log(__name__, "Analysis will be performed at (K): %s" % (options.temps), options.verbose, indent=2)
+  
   # first of all lets prepare the data for the calculations.
   log(__name__, "Preparing the data", options.verbose, indent=2)
   
   energies, min_energies, shifted_energies = prepare_energies(input_data_array, _accuracy, options)
-  
-  
-  
+    
   return success, error
 
 def prepare_energies(input_data_array, _accuracy, options):
@@ -44,7 +51,6 @@ def prepare_energies(input_data_array, _accuracy, options):
   min_energies = np.zeros(cases_cnt, _accuracy)
   energies = []
   shifted_energies = []
-  
   
   for i in range(cases_cnt):
     

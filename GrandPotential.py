@@ -28,7 +28,7 @@ def cmd_line_args():
 
   parser.disable_interspersed_args()
   
-  parser.add_option('-t', dest="temps", default=None, help="List of temperatures separated by a comma (default t=0)")
+  parser.add_option('-t', dest="temps", default="1", help="List of temperatures separated by a comma (default t=0)")
   parser.add_option("-v", dest="verbose", default=1, type="int", help="Verbose: 0 - off, 1 - on.")
   
   (options, args) = parser.parse_args()
@@ -65,7 +65,11 @@ if __name__ == "__main__":
   log(__name__, "Grand Cannonical Potential", options.verbose)
   
   # the main routine
-  main(options, args)
+  success, error = main(options, args)
   
-  log(__name__, "Finished.", options.verbose)
+  if success:
+    log(__name__, "Finished.", options.verbose)
+    
+  else:
+    log(__name__, "ERROR: %s" % (error), 1)
   
