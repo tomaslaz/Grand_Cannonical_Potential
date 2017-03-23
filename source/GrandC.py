@@ -40,6 +40,8 @@ def perform_grand_canonical_analysis(input_data_array, permutations, _accuracy, 
   
   Z_c_m_sums = prepare_Z_c_m(shifted_energies, temperatures, permutations, _accuracy, options)
   
+  print Z_c_m_sums
+  
   return success, error
 
 def prepare_energies(input_data_array, _accuracy, options):
@@ -100,9 +102,6 @@ def prepare_Z_c_m(shifted_energies, temperatures, permutations, _accuracy, optio
         sum_Ediff += _accuracy(math.exp(-1.0*(case_energies[i]) / (kT)))
 
       # including permutations term to account for probability
-      #prob = decimal.Decimal(Permutations.permutation(m)/decimal.Decimal(Constants.K))
-      prob  = 1
-      
       Z_c_m_sums[e_i][t_i] = _accuracy(permutations[e_i] / _accuracy(cnt_case_energies)) * sum_Ediff
         
   return Z_c_m_sums
