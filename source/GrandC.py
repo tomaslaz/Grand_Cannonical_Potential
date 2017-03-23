@@ -5,12 +5,14 @@ Grand canonical ensemble module.
 """
 
 import copy
+import math
 import numpy as np
 
+import Constants
 import Utilities
 from Utilities import log
 
-def perform_grand_canonical_analysis(input_data_array, _accuracy, options):
+def perform_grand_canonical_analysis(input_data_array, permutations, _accuracy, options):
   """
   The main method of the grand canonical analysis
   
@@ -35,7 +37,9 @@ def perform_grand_canonical_analysis(input_data_array, _accuracy, options):
   log(__name__, "Preparing the data", options.verbose, indent=2)
   
   energies, min_energies, shifted_energies = prepare_energies(input_data_array, _accuracy, options)
-    
+  
+  Z_c_m_sums = prepare_Z_c_m(shifted_energies, temperatures, permutations, _accuracy, options)
+  
   return success, error
 
 def prepare_energies(input_data_array, _accuracy, options):
@@ -48,7 +52,7 @@ def prepare_energies(input_data_array, _accuracy, options):
   
   cases_cnt = input_data_array.shape[0]
   
-  min_energies = np.zeros(cases_cnt, _accuracy)
+  min_energies = np.empty(cases_cnt, dtype=_accuracy)
   energies = []
   shifted_energies = []
   
@@ -65,3 +69,40 @@ def prepare_energies(input_data_array, _accuracy, options):
     shifted_energies.append(diff_energy)
       
   return energies, min_energies, shifted_energies
+
+def prepare_Z_c_m(shifted_energies, temperatures, permutations, _accuracy, options):
+  """
+  Prepares the sum of the second part of the Z_c_m equation
+  
+  """
+    
+  energies_cnt = len(shifted_energies)
+  temp_cnt = len(temperatures)
+  
+  Z_c_m_sums = np.empty([energies_cnt, temp_cnt], dtype=_accuracy)
+    
+  log(__name__, "Preparing Z_c_m_sums to speed up the calculations", options.verbose, indent=3)
+  
+  for t_i in range(temp_cnt):
+    temperature = temperatures[t_i]
+    
+    kT = _accuracy(Constants.kB * temperature)
+    
+    for e_i in range(energies_cnt):
+      
+      case_energies = shifted_energies[e_i]
+      cnt_case_energies = len(case_energies)
+      
+      sum_Ediff = _accuracy(0.0)
+      
+      # summing in the reverse order in order to account for small values
+      for i in reversed(range(cnt_case_energies)): 
+        sum_Ediff += _accuracy(math.exp(-1.0*(case_energies[i]) / (kT)))
+
+      # including permutations term to account for probability
+      #prob = decimal.Decimal(Permutations.permutation(m)/decimal.Decimal(Constants.K))
+      prob  = 1
+      
+      Z_c_m_sums[e_i][t_i] = _accuracy(permutations[e_i] / _accuracy(cnt_case_energies)) * sum_Ediff
+        
+  return Z_c_m_sums
