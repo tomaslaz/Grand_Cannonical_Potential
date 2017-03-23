@@ -14,7 +14,7 @@ def check_file(file_path):
   
   return os.path.isfile(file_path)
 
-def read_data(file_path):
+def read_data(file_path, _accuracy):
   """
   Reads in the data
   
@@ -29,6 +29,6 @@ def read_data(file_path):
     error = "File: %s cannot be found." % (file_path)
   
   else:
-    energies_data = np.loadtxt(file_path, skiprows=2, delimiter=',', unpack=True)
+    energies_data = np.loadtxt(file_path, skiprows=2, delimiter=',', unpack=True, dtype=_accuracy)
     
   return success, error, energies_data
