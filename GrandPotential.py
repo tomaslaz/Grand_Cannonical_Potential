@@ -11,6 +11,7 @@ from optparse import OptionParser
 #import sys
 
 import source.IO as IO
+import source.GrandC as GrandC
 from source.Utilities import log
 
 def cmd_line_args():
@@ -44,8 +45,11 @@ def main(options, args):
   # reading in the data
   success, error, data = IO.read_data(args[0])
   
-  # grand cannonical analysis
+  if success:
+    # grand cannonical analysis
+    success, error = GrandC.perform_grand_canonical_analysis(data)
   
+  return success, error
   
 if __name__ == "__main__":
   
