@@ -7,6 +7,7 @@ Grand canonical ensemble module.
 import copy
 import math
 import numpy as np
+import sys
 
 import Constants
 import Utilities
@@ -30,6 +31,17 @@ def perform_grand_canonical_analysis(input_data_array, permutations, _accuracy, 
   
   if not success:
     return success, error
+  
+  # reading in the chemical potential
+  if options.urange is not None:
+    success, error, chem_pot_range = Utilities.get_chem_pot_range(options.urange)
+    
+    print "chem_pot_range: ", chem_pot_range
+    
+    if not success:
+      return success, error
+    
+  sys.exit()
   
   log(__name__, "Analysis will be performed at (K): %s" % (options.temps), options.verbose, indent=2)
   
@@ -59,7 +71,6 @@ def prepare_energies(input_data_array, _accuracy, options):
   shifted_energies = []
   
   for i in range(cases_cnt):
-    
     # removes all zero values from the beginning and end of the array
     case_energies = np.trim_zeros(copy.deepcopy(input_data_array[i]))
     energies.append(case_energies)

@@ -7,6 +7,32 @@ Utilities module.
 import datetime
 import numpy as np
 
+def get_chem_pot_range(chem_pot_string):
+  """
+  Get the list of chemical potential values for the analysis
+  
+  """
+  
+  success = True
+  error = ""
+  chem_pot_range = None
+  
+  chem_pot_range_arr = chem_pot_string.split(",")
+  
+  if len(chem_pot_range_arr) != 3:
+    success = False
+  
+  chem_pot_range = np.arange(float(chem_pot_range_arr[0]), float(chem_pot_range_arr[1]), float(chem_pot_range_arr[2]))
+    
+  if len(chem_pot_range) < 1:
+    success = False
+
+  if not success:
+    error = "Incorrect chemical potential range: %s" % (chem_pot_string)
+    return success, error, None
+  
+  return success, error, chem_pot_range
+
 def get_list_of_temps(temp_string):
   """
   A function to process an argument string line to an array of temperatures
