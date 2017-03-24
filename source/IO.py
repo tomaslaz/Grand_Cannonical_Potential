@@ -15,6 +15,51 @@ def check_file(file_path):
   
   return os.path.isfile(file_path)
 
+def read_line_values_as_array(file_path, _accuracy, line_no):
+  """
+  Reads in chemical potential multipliers
+  
+  """
+  
+  success = True
+  error = ""
+  values = None
+  
+  if not check_file:
+    success = False
+    error = "File: %s cannot be found." % (file_path)
+  
+  else:
+    
+    try:
+      f = open(file_path)
+      
+    except:
+      success = False
+      error = "File: %s cannot be opened." % (file_path)
+      return success, error, values
+    
+    line_cnt = 0
+    for line in f:
+      if line_cnt == (line_no-1):
+        
+        array = line.split(",")
+        array_cnt = len(array)
+              
+        values = np.empty([array_cnt], dtype=_accuracy)
+        
+        for i in range(array_cnt):
+          values[i] = _accuracy(array[i].strip())
+
+      elif line_cnt > 1:
+        break
+      
+      line_cnt += 1
+      
+    f.close()
+  
+  return success, error, values
+
 def read_data(file_path, _accuracy):
   """
   Reads in the data
@@ -30,7 +75,7 @@ def read_data(file_path, _accuracy):
     error = "File: %s cannot be found." % (file_path)
   
   else:
-    energies_data = np.loadtxt(file_path, skiprows=2, delimiter=',', unpack=True, dtype=_accuracy)
+    energies_data = np.loadtxt(file_path, skiprows=3, delimiter=',', unpack=True, dtype=_accuracy)
     
   return success, error, energies_data
 

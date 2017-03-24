@@ -49,34 +49,39 @@ def main(options, args):
   data_file = args[0]
   
   # reading in the data
-  success, error, data, permutations, names = read_in_data(data_file, _accuracy, options)
+  success, error, names, permutations, chem_pot_multi, data = read_in_data(data_file, _accuracy, options)
   
   if success:
     # grand cannonical analysis
     log(__name__, "Performing the grand canonical analysis", options.verbose, indent=1)
-    success, error = GrandC.perform_grand_canonical_analysis(data, permutations, _accuracy, options)
+    success, error = GrandC.perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, _accuracy, options)
   
   return success, error
 
 def read_in_data(data_file, _accuracy, options):
   """
+  Reads in all the necessary data from the input file.
+  
   """
     
-  data = None
-  permutations = None
   names = None
+  permutations = None
+  chem_pot_multi = None
+  data = None
   
   # reading in the energies
   log(__name__, "Reading in data: %s" % (data_file), options.verbose, indent=1)
   success, error, data = IO.read_data(data_file, _accuracy)
   
-  if not success:
-    return success, error, data, permutations, names
-  
   # reading in the permutations
-  success, error, permutations = IO.read_permutations(data_file, _accuracy)
+  if success:
+    success, error, permutations = IO.read_line_values_as_array(data_file, _accuracy, line_no=2)
   
-  return success, error, data, permutations, names
+  # reading in chemical potential multipliers
+  if success:
+    success, error, chem_pot_multi = IO.read_line_values_as_array(data_file, _accuracy, line_no=3)
+      
+  return success, error, names, permutations, chem_pot_multi, data
 
 if __name__ == "__main__":
   
