@@ -13,7 +13,7 @@ import Constants
 import Utilities
 from Utilities import log
 
-def analyse_avg_m(temperatures, chem_pot_range, min_energies, Z_c_m_sums, 
+def analyse_avg_m(temperatures, chem_pot_range, min_energies, delta_E_sums, 
                   names, permutations, chem_pot_multi, _accuracy, options):
   """
   Analysis with respect to mu
@@ -29,34 +29,34 @@ def analyse_avg_m(temperatures, chem_pot_range, min_energies, Z_c_m_sums,
   
   avg_m_array = np.empty([temp_len, chem_pot_len], _accuracy)
   
-  print Z_c_m_sums
+  print delta_E_sums
   
   E_gm = np.min(min_energies)
   
     
   for t_i in range(temp_len):
-    
+     
     kT = np.longdouble(Constants.kB * temperatures[t_i])
-  
+   
     mu_cnt = 0
     for mu in chem_pot_range:    
-       
+        
       Sum2 = _accuracy(0.0)
- 
-      for chem_pot_i in reversed(range(chem_pot_multi_len)):
-         
-        mm = chem_pot_multi[chem_pot_i]
-         
-        Emin_mm = min_energies[chem_pot_i]
-        
-        expExprIn = _accuracy(-1.0*(Emin_mm + mm*mu)/kT)
-                
-        expExpr = _accuracy(np.exp(expExprIn))
-        
-        print temperatures[t_i], kT, E_gm,  _accuracy(np.exp(-E_gm/kT))
-        
-        Sum2 += expExpr * Z_c_m_sums[chem_pot_i][t_i]
-         
+#  
+#       for chem_pot_i in reversed(range(chem_pot_multi_len)):
+#          
+#         mm = chem_pot_multi[chem_pot_i]
+#          
+#         Emin_mm = min_energies[chem_pot_i]
+#         
+#         expExprIn = _accuracy(-1.0*(Emin_mm + mm*mu)/kT)
+#                 
+#         expExpr = _accuracy(np.exp(expExprIn))
+#         
+#         print temperatures[t_i], kT, E_gm,  _accuracy(np.exp(-E_gm/kT))
+#         
+#         Sum2 += expExpr * Z_c_m_sums[chem_pot_i][t_i]
+#          
        
 #        
 #       N = np.longdouble(0.0)
@@ -76,10 +76,9 @@ def analyse_avg_m(temperatures, chem_pot_range, min_energies, Z_c_m_sums,
 #         N += Sum1/Sum2
 #         
 #       avg_m_array[temp_cnt][mu_cnt] = N
-       
+#        
       mu_cnt += 1
 
-  
   return success, error
 
 def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, _accuracy, options):
@@ -119,17 +118,54 @@ def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, 
   
   energies, min_energies, shifted_energies = prepare_energies(data, _accuracy, options)
   
-  Z_c_m_sums = prepare_Z_c_m(shifted_energies, temperatures, permutations, _accuracy, options)
+  delta_E_sums = prepare_delta_E_sums(shifted_energies, temperatures, _accuracy, options)
   
   # Perform chemical potential analysis
   if chem_pot_analysis:
-    success, error = analyse_avg_m(temperatures, chem_pot_range, min_energies, Z_c_m_sums, 
-                                   names, permutations, chem_pot_multi, _accuracy, options)
+    
+    success, error, Wm_array = prepare_Wm(temperatures, chem_pot_range, chem_pot_multi, _accuracy, options)
+    
+        
+#     success, error = analyse_avg_m(temperatures, chem_pot_range, min_energies, delta_E_sums, 
+#                                    names, permutations, chem_pot_multi, _accuracy, options)
   
   if not success:
     return success, error
   
   return success, error
+
+def prepare_delta_E_sums(shifted_energies, temperatures, _accuracy, options):
+  """
+  Prepares the sum of the second part of the Z_c_m equation
+  
+  """
+    
+  energies_cnt = len(shifted_energies)
+  temp_cnt = len(temperatures)
+  
+  delta_E_sums = np.empty([energies_cnt, temp_cnt], dtype=_accuracy)
+    
+  log(__name__, "Preparing delta_E_sums to speed up the calculations", options.verbose, indent=3)
+  
+  for t_i in range(temp_cnt):
+    temperature = temperatures[t_i]
+    
+    kT = _accuracy(Constants.kB * temperature)
+    
+    for e_i in range(energies_cnt):
+      
+      case_energies = shifted_energies[e_i]
+      cnt_case_energies = len(case_energies)
+      
+      sum_Ediff = _accuracy(0.0)
+      
+      # summing in the reverse order in order to account for small values
+      for i in reversed(range(cnt_case_energies)): 
+        sum_Ediff += _accuracy(math.exp(-1.0*(case_energies[i]) / (kT)))
+
+      delta_E_sums[e_i][t_i] = sum_Ediff
+        
+  return delta_E_sums
 
 def prepare_energies(input_data_array, _accuracy, options):
   """
@@ -158,36 +194,30 @@ def prepare_energies(input_data_array, _accuracy, options):
       
   return energies, min_energies, shifted_energies
 
-def prepare_Z_c_m(shifted_energies, temperatures, permutations, _accuracy, options):
+def prepare_Wm(temperatures, chem_pot_range, chem_pot_multi, _accuracy, options):
   """
-  Prepares the sum of the second part of the Z_c_m equation
-  
   """
-    
-  energies_cnt = len(shifted_energies)
-  temp_cnt = len(temperatures)
   
-  Z_c_m_sums = np.empty([energies_cnt, temp_cnt], dtype=_accuracy)
-    
-  log(__name__, "Preparing Z_c_m_sums to speed up the calculations", options.verbose, indent=3)
+  log(__name__, "Preparing Wm", options.verbose, indent=3)
   
-  for t_i in range(temp_cnt):
-    temperature = temperatures[t_i]
-    
-    kT = _accuracy(Constants.kB * temperature)
-    
-    for e_i in range(energies_cnt):
+  success = True
+  error = ""
+  
+  temp_len = len(temperatures)
+  chem_pot_len = len(chem_pot_range)
+  chem_pot_multi_len = len(chem_pot_multi)
+  
+  Wm_array = np.empty([temp_len, chem_pot_len], _accuracy)
+  
+  for t_i in range(temp_len):
+     
+    kT = np.longdouble(Constants.kB * temperatures[t_i])
+   
+    mu_cnt = 0
+    for mu in chem_pot_range:    
       
-      case_energies = shifted_energies[e_i]
-      cnt_case_energies = len(case_energies)
+      mu_cnt += 1
       
-      sum_Ediff = _accuracy(0.0)
-      
-      # summing in the reverse order in order to account for small values
-      for i in reversed(range(cnt_case_energies)): 
-        sum_Ediff += _accuracy(math.exp(-1.0*(case_energies[i]) / (kT)))
-
-      # including permutations term to account for probability
-      Z_c_m_sums[e_i][t_i] = _accuracy(permutations[e_i] / _accuracy(cnt_case_energies)) * sum_Ediff
-        
-  return Z_c_m_sums
+  
+  return Wm_array
+  
