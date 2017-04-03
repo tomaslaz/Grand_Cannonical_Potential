@@ -7,6 +7,29 @@ Utilities module.
 import datetime
 import numpy as np
 
+def factorial_devision(up_fac, down_fac, _accuracy):
+  """
+  Calculates the devision of two factorials
+  
+  """
+  
+  up_fac_int = np.int32(up_fac)
+  down_fac_int = np.int32(down_fac)
+  
+  result = _accuracy(1)
+  
+  if up_fac_int > down_fac_int:
+    for i in range(down_fac_int+1, up_fac_int+1):
+      result *= _accuracy(i)
+      
+  elif up_fac_int < down_fac_int:
+    for i in range(up_fac_int+1, down_fac_int+1):
+      result *= _accuracy(i)
+    
+    result = _accuracy(1) / result
+    
+  return result
+
 def get_chem_pot_range(chem_pot_string):
   """
   Get the list of chemical potential values for the analysis

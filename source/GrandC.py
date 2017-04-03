@@ -13,6 +13,31 @@ import Constants
 import Utilities
 from Utilities import log
 
+def calc_permutation(m, mm, _accuracy):
+  """
+  Evaluates the permutation expression
+  
+  """
+  
+  cat_sites = 108
+  an_sites = 216
+  
+  up_fac = cat_sites - 2*m
+  down_fac = cat_sites - 2*mm
+  
+  value = Utilities.factorial_devision(up_fac, down_fac, _accuracy)
+  
+  value *= Utilities.factorial_devision(2*m, 2*mm, _accuracy)
+  
+  up_fac = an_sites - m
+  down_fac = an_sites - mm
+  
+  value *= Utilities.factorial_devision(up_fac, down_fac, _accuracy)
+  
+  value *= Utilities.factorial_devision(m, mm, _accuracy)
+  
+  return value
+
 def analyse_avg_m(temperatures, chem_pot_range, min_energies, delta_E_sums, 
                   names, permutations, chem_pot_multi, _accuracy, options):
   """
@@ -224,38 +249,24 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
         Wm_value = _accuracy(0.0)
         
         # Estimating the bottom part of Wm
-        
         sum_botton = _accuracy(0.0)
         
         for mm_index in range(chem_pot_multi_len):
           mm_value = chem_pot_multi[mm_index]
           Emin_mm = min_energies[mm_index]
           
-          expExprIn = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
-          expExpr = _accuracy(np.exp(expExprIn))
+          exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
+          exp_expr = _accuracy(np.exp(exp_expr_pow))
           
+          print Emin_m - Emin_mm, m_value, mm_value, mu, exp_expr_pow, exp_expr
           
-          print Emin_m, Emin_mm, Emin_m - Emin_mm
+          permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
           
-          #print m_value, temperatures[t_i], mu, mm_value, "expExprIn", expExprIn, "expExpr", expExpr
+          attempts_cnt = 0.0 #Nm / Nmm
           
-          exp_term = _accuracy(0.0)
-          
-          permutation = _accuracy(0.0)
-          
-          sum_botton = delta_E_sums[mm_index]
+          sum_botton += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index]
         
-#         
-#         expExprIn = _accuracy(-1.0*(Emin_m + c_p_multi*mu)/kT)
-#         
-#         
-        
-        
-        #print c_p_multi, temperatures[t_i], mu, Emin_m, expExprIn, expExpr, sum_top
-        
-           
-        
-        
+        Wm_value = sum_top / sum_botton
         
         Wm_array[m_idx, t_i, mu_i] = Wm_value
         
