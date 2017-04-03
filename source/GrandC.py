@@ -123,7 +123,7 @@ def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, 
   # Perform chemical potential analysis
   if chem_pot_analysis:
     
-    success, error, Wm_array = prepare_Wm(temperatures, chem_pot_range, chem_pot_multi, _accuracy, options)
+    Wm_array = prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, _accuracy, options)
     
         
 #     success, error = analyse_avg_m(temperatures, chem_pot_range, min_energies, delta_E_sums, 
@@ -194,30 +194,72 @@ def prepare_energies(input_data_array, _accuracy, options):
       
   return energies, min_energies, shifted_energies
 
-def prepare_Wm(temperatures, chem_pot_range, chem_pot_multi, _accuracy, options):
+def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, _accuracy, options):
   """
+  Evaluates Wm with respect to temperature and chemical potential
+  
   """
   
   log(__name__, "Preparing Wm", options.verbose, indent=3)
-  
-  success = True
-  error = ""
   
   temp_len = len(temperatures)
   chem_pot_len = len(chem_pot_range)
   chem_pot_multi_len = len(chem_pot_multi)
   
-  Wm_array = np.empty([temp_len, chem_pot_len], _accuracy)
+  Wm_array = np.empty([chem_pot_multi_len, temp_len, chem_pot_len], _accuracy)
   
-  for t_i in range(temp_len):
+  for m_idx in range(chem_pot_multi_len):
+    m_value = chem_pot_multi[m_idx]
+    Emin_m = min_energies[m_idx]
+    
+    # Estimating the top part of Wm
+    sum_top = delta_E_sums[m_idx]
+    
+    for t_i in range(temp_len):
+      kT = np.longdouble(Constants.kB * temperatures[t_i])
      
-    kT = np.longdouble(Constants.kB * temperatures[t_i])
-   
-    mu_cnt = 0
-    for mu in chem_pot_range:    
+      mu_i = 0
+      for mu in chem_pot_range:    
+        
+        Wm_value = _accuracy(0.0)
+        
+        # Estimating the bottom part of Wm
+        
+        sum_botton = _accuracy(0.0)
+        
+        for mm_index in range(chem_pot_multi_len):
+          mm_value = chem_pot_multi[mm_index]
+          Emin_mm = min_energies[mm_index]
+          
+          expExprIn = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
+          expExpr = _accuracy(np.exp(expExprIn))
+          
+          
+          print Emin_m, Emin_mm, Emin_m - Emin_mm
+          
+          #print m_value, temperatures[t_i], mu, mm_value, "expExprIn", expExprIn, "expExpr", expExpr
+          
+          exp_term = _accuracy(0.0)
+          
+          permutation = _accuracy(0.0)
+          
+          sum_botton = delta_E_sums[mm_index]
+        
+#         
+#         expExprIn = _accuracy(-1.0*(Emin_m + c_p_multi*mu)/kT)
+#         
+#         
+        
+        
+        #print c_p_multi, temperatures[t_i], mu, Emin_m, expExprIn, expExpr, sum_top
+        
+           
+        
+        
+        
+        Wm_array[m_idx, t_i, mu_i] = Wm_value
+        
+        mu_i += 1
       
-      mu_cnt += 1
-      
-  
   return Wm_array
   
