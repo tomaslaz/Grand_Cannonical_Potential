@@ -13,6 +13,21 @@ import Constants
 import Utilities
 from Utilities import log
 
+def avg_m_analysis(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
+  """
+  Calculates and plots average m
+  
+  """
+
+  success = True
+  error = ""
+  
+  print "temperatures: ", temperatures
+  print "chem_pot_range: ", chem_pot_range
+  print "chem_pot_multi: ", chem_pot_multi
+  
+  return success, error
+  
 def calc_permutation(m, mm, _accuracy):
   """
   Evaluates the permutation expression
@@ -73,18 +88,21 @@ def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, 
   # first of all lets prepare the data for the calculations.
   log(__name__, "Preparing the data", options.verbose, indent=2)
   
-  energies, min_energies, shifted_energies = prepare_energies(data, _accuracy, options)
+  energies, min_energies, shifted_energies, experiment_cnts = prepare_energies(data, _accuracy, options)
   
   delta_E_sums = prepare_delta_E_sums(shifted_energies, temperatures, _accuracy, options)
   
   # Perform chemical potential analysis
   if chem_pot_analysis:
+    # Preparing Wm probabilities    
+    Wm_array = prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
+                          experiment_cnts, _accuracy, options)
     
-    Wm_array = prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, _accuracy, options)
-    
-        
+    # Average m analysis
+    success, error = avg_m_analysis(temperatures, chem_pot_range, chem_pot_multi, Wm_array, 
+                                    _accuracy, options)
 #     success, error = analyse_avg_m(temperatures, chem_pot_range, min_energies, delta_E_sums, 
-#                                    names, permutations, chem_pot_multi, _accuracy, options)
+#                                    names, permutations, chem_pot_multi)
   
   if not success:
     return success, error
@@ -137,6 +155,7 @@ def prepare_energies(input_data_array, _accuracy, options):
   min_energies = np.empty(cases_cnt, dtype=_accuracy)
   energies = []
   shifted_energies = []
+  experiment_cnts = np.empty(cases_cnt, dtype=_accuracy)
   
   for i in range(cases_cnt):
     # removes all zero values from the beginning and end of the array
@@ -148,10 +167,14 @@ def prepare_energies(input_data_array, _accuracy, options):
     
     diff_energy = case_energies - min_energies[i]
     shifted_energies.append(diff_energy)
+    
+    # saving the number of experiments of the stoichiometry
+    experiment_cnts[i] = len(case_energies)
       
-  return energies, min_energies, shifted_energies
+  return energies, min_energies, shifted_energies, experiment_cnts
 
-def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, _accuracy, options):
+def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
+               _accuracy, options):
   """
   Evaluates Wm with respect to temperature and chemical potential
   
@@ -187,15 +210,16 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           mm_value = chem_pot_multi[mm_index]
           Emin_mm = min_energies[mm_index]
           
+          # exponential term
           exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
           exp_expr = _accuracy(np.exp(exp_expr_pow))
           
-          print Emin_m - Emin_mm, m_value, mm_value, mu, exp_expr_pow, exp_expr
+          # Nm/Nmm
+          attempts_cnt = experiment_cnts[m_idx] / experiment_cnts[mm_index] 
           
+          # Pmm/Pm
           permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
-          
-          attempts_cnt = 0.0 #Nm / Nmm
-          
+
           sum_botton += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index]
         
         Wm_value = sum_top / sum_botton
