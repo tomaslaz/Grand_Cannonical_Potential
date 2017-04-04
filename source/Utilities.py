@@ -82,6 +82,55 @@ def get_list_of_temps(temp_string):
   
   return success, error, temps
 
+def get_temperature_colour(temperature):
+  """
+  Returns colour name with respect to the temperature
+  
+  """
+  
+  colour = 'black'
+  
+  if temperature <= 100:
+    colour = 'b'
+      
+  elif temperature <= 300:
+    colour = 'g'
+    
+  elif temperature <= 500:
+    colour = 'r'
+    
+  elif temperature <= 1000:
+    colour = 'c'
+  
+  elif temperature <= 2000:
+    colour = 'y'
+
+  elif temperature <= 3000:
+    colour = 'm'
+
+  elif temperature <= 4000:
+    colour = 'darkblue'
+
+  elif temperature <= 5000:
+    colour = 'sienna'
+
+  elif temperature <= 6000:
+    colour = 'indigo'
+  
+  elif temperature <= 7000:
+    colour = 'orange'
+  
+  elif temperature <= 8000:
+    colour = 'grey'
+    
+  elif temperature <= 9000:
+    colour = 'brown'
+    
+  elif temperature <= 10000:
+    colour = 'black'
+  
+  return colour
+
 def log(caller, message, verbose, indent=0):
   """
   Log output to screen
