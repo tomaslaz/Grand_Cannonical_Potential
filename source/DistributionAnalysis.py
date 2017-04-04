@@ -96,12 +96,12 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
       else:
         ax.plot(xs=x, ys=y, zs=mu, zdir='y', color=colour, linewidth=1.0)
       
-    ax.set_xlabel(r'$<m>$', fontsize=Constants.fig_label_fontsize)
+    ax.set_xlabel(r'$m$', fontsize=Constants.fig_label_fontsize)
          
     ax.set_zlabel(r'$w_{m}$', fontsize=Constants.fig_label_fontsize)
     ax.set_zlim3d(0, 1)
       
-    ax.set_ylabel(r'$\mu$', fontsize=Constants.fig_label_fontsize)
+    ax.set_ylabel(r'$\mu (eV)$', fontsize=Constants.fig_label_fontsize)
      
     ax.set_ylim3d(np.min(chem_pot_range), np.max(chem_pot_range))
      
@@ -140,7 +140,7 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
         Emin_m = min_energies[m_idx]
         
         # Estimating the top part of Wm
-        sum_top = delta_E_sums[m_idx]
+        sum_top = delta_E_sums[m_idx][t_i]
         
         # Estimating the bottom part of Wm
         sum_bottom = _accuracy(0.0)
@@ -159,13 +159,11 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           # Pmm/Pm
           permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
 
-          sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index]
+          sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
         
         Wm_value = sum_top / sum_bottom
         
         Wm_sum += Wm_value
-        
-        print "Wm_value: ", Wm_value, "sum_top: ", sum_top, "sum_bottom: ", sum_bottom
         
         Wm_array[t_i, mu_i, m_idx] = Wm_value
       

@@ -94,7 +94,7 @@ def prepare_delta_E_sums(shifted_energies, temperatures, _accuracy, options):
         sum_Ediff += _accuracy(math.exp(-1.0*(case_energies[i]) / (kT)))
 
       delta_E_sums[e_i][t_i] = sum_Ediff
-        
+    
   return delta_E_sums
 
 def prepare_energies(input_data_array, _accuracy, options):
@@ -125,7 +125,7 @@ def prepare_energies(input_data_array, _accuracy, options):
     
     # saving the number of experiments of the stoichiometry
     experiment_cnts[i] = len(case_energies)
-      
+  
   return energies, min_energies, shifted_energies, experiment_cnts
 
   
