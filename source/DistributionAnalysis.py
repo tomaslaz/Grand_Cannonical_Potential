@@ -52,8 +52,11 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   Wm_array = prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
                         experiment_cnts, _accuracy, options)
   
-  # Plotting the Wm probabilities
-  dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
+#   # Plotting the Wm probabilities 3D plots
+#   dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
+  
+  # Plotting the Wm probabilities 3D contour plot
+  dist_func_analysis_temp_mu_contour_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
   return success, error
 
@@ -62,11 +65,7 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
   Plots distribution functions in terms of m and mu with respect to the temperature
   
   """
-  
-  #print "chem_pot_range: ", chem_pot_range
-#   print ": ", 
-#   print ": ", 
-  
+    
   temp_len = len(temperatures)
   chem_pot_len = len(chem_pot_range)
   
@@ -106,6 +105,72 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
     ax.set_ylim3d(np.min(chem_pot_range), np.max(chem_pot_range))
      
     plt.legend(loc=2, title="Temperature (K)", ncol=2, fontsize=Constants.fig_legend_fontsize, borderaxespad=0.)
+     
+    fig.savefig(file_name, dpi=Constants.fig_dpi, bbox_inches='tight')
+     
+    # clearing the figure settings   
+    plt.clf()
+    plt.close()
+
+def dist_func_analysis_temp_mu_contour_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
+  """
+  Plots distribution functions in terms of m and mu with respect to the temperature
+  
+  """
+    
+  temp_len = len(temperatures)
+  chem_pot_len = len(chem_pot_range)
+  
+  X, Y = np.meshgrid(chem_pot_multi, chem_pot_range)
+    
+  # for each temperature:
+  for t_i in range(temp_len):
+    
+    temperature = temperatures[t_i]
+    
+    file_name = 'wm_%.2d.png' % (temperature)
+    
+    log(__name__, "Plotting the distribution functions for %.2d K (%s)" % (temperature, file_name), options.verbose, indent=3)
+    
+    fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
+#     ax = fig.add_subplot(111, projection='3d')
+#     # plotting for each mu
+#     for mu_i in range(chem_pot_len):
+#       mu = chem_pot_range[mu_i]
+#       
+#       x = chem_pot_multi
+#       y = Wm_array[t_i, mu_i, :]
+#       
+    Z = Wm_array[t_i, :, :]    
+    contour = plt.contourf(X, Y, Z)
+    
+    #plt.clabel(contour, colors = 'k', fmt = '%2.1f', fontsize=12)
+    
+    c = ('#ff0000', '#ffff00', '#0000FF', '0.6', 'c', 'm')
+    
+    levels = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    
+    contour_filled = plt.contourf(X, Y, Z, levels) #colors=c
+    plt.colorbar(contour)
+
+    plt.xlabel(r'$m$', fontsize=Constants.fig_label_fontsize)
+    plt.ylabel(r'$\mu (eV)$', fontsize=Constants.fig_label_fontsize)
+    
+#       colour = Utilities.get_temperature_colour(temperature)
+#       
+#       if mu_i == 0:
+#         ax.plot(xs=x, ys=y, zs=mu, zdir='y', color=colour, linewidth=1.0, label="%d" % (temperature))
+#       else:
+#         ax.plot(xs=x, ys=y, zs=mu, zdir='y', color=colour, linewidth=1.0)
+#       
+#     ax.set_xlabel()
+#          
+#     ax.set_zlabel(r'$w_{m}$', fontsize=Constants.fig_label_fontsize)
+#     ax.set_zlim3d(0, 1)
+#      
+#     ax.set_ylim3d(np.min(chem_pot_range), np.max(chem_pot_range))
+#      
+#     plt.legend(loc=2, title="Temperature (K)", ncol=2, fontsize=Constants.fig_legend_fontsize, borderaxespad=0.)
      
     fig.savefig(file_name, dpi=Constants.fig_dpi, bbox_inches='tight')
      
