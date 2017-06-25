@@ -127,5 +127,3 @@ def prepare_energies(input_data_array, _accuracy, options):
     experiment_cnts[i] = len(case_energies)
   
   return energies, min_energies, shifted_energies, experiment_cnts
-
-  
