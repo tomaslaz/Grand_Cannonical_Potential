@@ -56,14 +56,11 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
                         experiment_cnts, permutations, _accuracy, options)
   
   # Plotting the Wm probabilities 3D plots
-  dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
-  
-  # Plotting the Wm probabilities 3D contour plot
-  #dist_func_analysis_temp_mu_contour_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
+  dist_func_analysis_temp_mu_m_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
   return success, error
 
-def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
+def dist_func_analysis_temp_mu_m_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
   """
   Plots distribution functions in terms of m and mu with respect to the temperature
   
@@ -91,7 +88,7 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
 
     Z = Wm_array[t_i, :, :]    
   
-    contour_filled = plt.contourf(X, Y, Z, levels, cmap=cmap, interpolation='bilinear', vmax=1.1, vmin=0.0)
+    contour_filled = plt.contourf(Y, X, Z, levels, cmap=cmap, interpolation='bilinear', vmax=1.1, vmin=0.0)
     
     cbar = plt.colorbar(contour_filled, ticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
     cbar.ax.tick_params(labelsize=16) 
@@ -99,11 +96,12 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
       
     for tick in cbar.ax.yaxis.get_major_ticks():
       tick.label.set_fontsize(16) 
-  
-    plt.xlabel(r'$<m>$', fontsize = Constants.fig_label_fontsize)
       
-    plt.ylabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
+      
+    plt.xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
     
+    plt.ylabel(r'$<m>$', fontsize = Constants.fig_label_fontsize)
+      
     plt.title("T = %d K" % (temperature), fontsize = Constants.fig_legend_fontsize)
     
     ax = plt.gca()
@@ -115,72 +113,6 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
     
     fig.savefig(file_name+".png", dpi=Constants.fig_dpi, bbox_inches='tight')
          
-    # clearing the figure settings   
-    plt.clf()
-    plt.close()
-
-def dist_func_analysis_temp_mu_contour_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
-  """
-  Plots distribution functions in terms of m and mu with respect to the temperature
-  
-  """
-    
-  temp_len = len(temperatures)
-  chem_pot_len = len(chem_pot_range)
-  
-  X, Y = np.meshgrid(chem_pot_multi, chem_pot_range)
-    
-  # for each temperature:
-  for t_i in range(temp_len):
-    
-    temperature = temperatures[t_i]
-    
-    file_name = 'wm_%.2d.png' % (temperature)
-    
-    log(__name__, "Plotting the distribution functions for %.2d K (%s)" % (temperature, file_name), options.verbose, indent=3)
-    
-    fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
-#     ax = fig.add_subplot(111, projection='3d')
-#     # plotting for each mu
-#     for mu_i in range(chem_pot_len):
-#       mu = chem_pot_range[mu_i]
-#       
-#       x = chem_pot_multi
-#       y = Wm_array[t_i, mu_i, :]
-#       
-    Z = Wm_array[t_i, :, :]    
-    contour = plt.contourf(X, Y, Z)
-    
-    #plt.clabel(contour, colors = 'k', fmt = '%2.1f', fontsize=12)
-    
-    c = ('#ff0000', '#ffff00', '#0000FF', '0.6', 'c', 'm')
-    
-    levels = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    
-    contour_filled = plt.contourf(X, Y, Z, levels) #colors=c
-    plt.colorbar(contour)
-
-    plt.xlabel(r'$m$', fontsize=Constants.fig_label_fontsize)
-    plt.ylabel(r'$\mu (eV)$', fontsize=Constants.fig_label_fontsize)
-    
-#       colour = Utilities.get_temperature_colour(temperature)
-#       
-#       if mu_i == 0:
-#         ax.plot(xs=x, ys=y, zs=mu, zdir='y', color=colour, linewidth=1.0, label="%d" % (temperature))
-#       else:
-#         ax.plot(xs=x, ys=y, zs=mu, zdir='y', color=colour, linewidth=1.0)
-#       
-#     ax.set_xlabel()
-#          
-#     ax.set_zlabel(r'$w_{m}$', fontsize=Constants.fig_label_fontsize)
-#     ax.set_zlim3d(0, 1)
-#      
-#     ax.set_ylim3d(np.min(chem_pot_range), np.max(chem_pot_range))
-#      
-#     plt.legend(loc=2, title="Temperature (K)", ncol=2, fontsize=Constants.fig_legend_fontsize, borderaxespad=0.)
-     
-    fig.savefig(file_name, dpi=Constants.fig_dpi, bbox_inches='tight')
-     
     # clearing the figure settings   
     plt.clf()
     plt.close()
@@ -198,7 +130,7 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
   chem_pot_len = len(chem_pot_range)
   chem_pot_multi_len = len(chem_pot_multi)
   
-  Wm_array = np.empty([temp_len, chem_pot_len, chem_pot_multi_len], _accuracy)
+  Wm_array = np.zeros([temp_len, chem_pot_len, chem_pot_multi_len], _accuracy)
   
   for t_i in range(temp_len):
     kT = np.longdouble(Constants.kB * temperatures[t_i])
@@ -220,43 +152,61 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
         # Estimating the bottom part of Wm
         sum_bottom = _accuracy(0.0)
         
+        # Calculating exponential terms powers
+        exp_powers = np.empty(chem_pot_multi_len, _accuracy)
+        
         for mm_index in range(chem_pot_multi_len):
           mm_value = chem_pot_multi[mm_index]
           Emin_mm = min_energies[mm_index]
           
-          # exponential term
-          exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
-          
-          if ((exp_expr_pow > Constants.BIGEXPO) or (exp_expr_pow < -Constants.BIGEXPO)):
-            # the value of the exponential value is too damn high
-            breakLoops = True
-            break
-          
-          else:
-             exp_expr = _accuracy(np.exp(exp_expr_pow))
-          
-          # Nm/Nmm
-          attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
-          
-          # Pmm/Pm
-          if options.permCalc:
-            permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
-          else:
-            permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
-          
-          sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
+          # the power of the exponential term
+          exp_powers[mm_index] = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
+        
+        for mm_index in range(chem_pot_multi_len):
+          if mm_index != m_index:
+            
+            mm_value = chem_pot_multi[mm_index]
+            Emin_mm = min_energies[mm_index]
+            
+            # exponential term
+            exp_expr_pow = exp_powers[mm_index]
+                        
+            if (exp_expr_pow > Constants.BIGEXPO):
+              # the value of the exponential power is too damn high
+              breakLoops = True              
+              break
+            
+            elif exp_expr_pow < -Constants.BIGEXPO:
+              exp_expr = 0.0
+            else:
+               exp_expr = _accuracy(np.exp(exp_expr_pow))
+            
+            # Nm/Nmm
+            attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
+            
+            # Pmm/Pm
+            if options.permCalc:
+              permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
+            else:
+              permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
+            
+            sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
           
         if not breakLoops:
-          Wm_value = sum_top / sum_bottom
+          
+          if sum_bottom == 0.0:
+            Wm_value = 1.1
+          else:
+            Wm_value = sum_top / sum_bottom
             
           Wm_sum += Wm_value
         else:
           Wm_value = 0
-        
+
         Wm_array[t_i, mu_i, m_index] = Wm_value
-      
+       
       # Normalising
       if Wm_sum != 0.0:
         Wm_array[t_i, mu_i, :] /= Wm_sum
-      
+  
   return Wm_array
