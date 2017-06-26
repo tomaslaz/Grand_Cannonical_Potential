@@ -7,9 +7,9 @@ Utilities module.
 import datetime
 import numpy as np
 
-def factorial_devision(up_fac, down_fac, _accuracy):
+def factorial_division(up_fac, down_fac, _accuracy):
   """
-  Calculates the devision of two factorials
+  Calculates a division of two factorials
   
   """
   

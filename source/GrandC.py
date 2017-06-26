@@ -50,14 +50,14 @@ def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, 
   log(__name__, "Preparing the data", options.verbose, indent=2)
   
   energies, min_energies, shifted_energies, experiment_cnts = prepare_energies(data, _accuracy, options)
-  
+    
   delta_E_sums = prepare_delta_E_sums(shifted_energies, temperatures, _accuracy, options)
-  
+    
   # Perform chemical potential analysis
   if chem_pot_analysis:
     # performs distribution analysis    
     success, error = DistributionAnalysis.distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, 
-                                           min_energies, delta_E_sums, experiment_cnts, _accuracy, options)
+                                           min_energies, delta_E_sums, experiment_cnts, permutations, _accuracy, options)
       
   if not success:
     return success, error

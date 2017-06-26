@@ -10,9 +10,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 import Constants
+import sys
 import Utilities
 from Utilities import log
 
+# TODO: needs to made universal
 def calc_permutation(m, mm, _accuracy):
   """
   Evaluates the permutation expression
@@ -25,21 +27,21 @@ def calc_permutation(m, mm, _accuracy):
   up_fac = cat_sites - 2*m
   down_fac = cat_sites - 2*mm
   
-  value = Utilities.factorial_devision(up_fac, down_fac, _accuracy)
+  value = Utilities.factorial_division(up_fac, down_fac, _accuracy)
   
-  value *= Utilities.factorial_devision(2*m, 2*mm, _accuracy)
+  value *= Utilities.factorial_division(2*m, 2*mm, _accuracy)
   
   up_fac = an_sites - m
   down_fac = an_sites - mm
   
-  value *= Utilities.factorial_devision(up_fac, down_fac, _accuracy)
+  value *= Utilities.factorial_division(up_fac, down_fac, _accuracy)
   
-  value *= Utilities.factorial_devision(m, mm, _accuracy)
+  value *= Utilities.factorial_division(m, mm, _accuracy)
   
   return value
 
 def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
-                        experiment_cnts, _accuracy, options):
+                        experiment_cnts, permutations, _accuracy, options):
   """
   Performs the distribution analysis: evaluates Wm and plots it against m and mu.
   
@@ -50,7 +52,7 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   
   # Preparing Wm probabilities    
   Wm_array = prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
-                        experiment_cnts, _accuracy, options)
+                        experiment_cnts, permutations, _accuracy, options)
   
   # Plotting the Wm probabilities 3D plots
   dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
@@ -82,7 +84,7 @@ def dist_func_analysis_temp_mu_3D_plots(temperatures, chem_pot_range, chem_pot_m
     
     file_name = 'wm_%.2d.png' % (temperature)
     
-    log(__name__, "Plotting the distribution functions for %.2d K (%s)" % (temperature, file_name), options.verbose, indent=3)
+    log(__name__, "Plotting distribution functions @ %.2d K (%s)" % (temperature, file_name), options.verbose, indent=3)
     
     fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
 
@@ -183,7 +185,7 @@ def dist_func_analysis_temp_mu_contour_plots(temperatures, chem_pot_range, chem_
     plt.close()
     
 def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
-               _accuracy, options):
+               permutations, _accuracy, options):
   """
   Evaluates Wm with respect to temperature and chemical potential
   
@@ -204,12 +206,13 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
       mu = chem_pot_range[mu_i]
       
       Wm_sum = _accuracy(0.0)
-      for m_idx in range(chem_pot_multi_len):
-        m_value = chem_pot_multi[m_idx]
-        Emin_m = min_energies[m_idx]
+      for m_index in range(chem_pot_multi_len):
+        
+        m_value = chem_pot_multi[m_index]
+        Emin_m = min_energies[m_index]
         
         # Estimating the top part of Wm
-        sum_top = delta_E_sums[m_idx][t_i]
+        sum_top = delta_E_sums[m_index][t_i]
         
         # Estimating the bottom part of Wm
         sum_bottom = _accuracy(0.0)
@@ -220,21 +223,23 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           
           # exponential term
           exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
+          
           exp_expr = _accuracy(np.exp(exp_expr_pow))
 
           # Nm/Nmm
-          attempts_cnt = experiment_cnts[m_idx] / experiment_cnts[mm_index] 
+          attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
           
           # Pmm/Pm
-          permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
-
+          #permutation2 = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
+          permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
+          
           sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
         
         Wm_value = sum_top / sum_bottom
         
         Wm_sum += Wm_value
         
-        Wm_array[t_i, mu_i, m_idx] = Wm_value
+        Wm_array[t_i, mu_i, m_index] = Wm_value
       
       # Normalising
       Wm_array[t_i, mu_i, :] /= Wm_sum

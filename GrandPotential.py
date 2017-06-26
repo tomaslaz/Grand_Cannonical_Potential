@@ -28,10 +28,12 @@ def cmd_line_args():
 
   parser.disable_interspersed_args()
   
+  parser.add_option("-p", "--permutations", dest="permCalc", action="store_true", default=False, 
+    help="Permutations will be calculated instead of read from the data file. User must modify: DistributionAnalysis.calc_permutation")
   parser.add_option('-t', dest="temps", default="1", help="List of temperatures separated by a comma (default: T=0)")
-  parser.add_option("-v", dest="verbose", default=1, type="int", help="Verbose: 0 - off, 1 - on.")
   parser.add_option('-u', dest="urange", default=None, 
                     help="Chemical potential range: (default: None, syntax: 0,0.1,0.1)")
+  parser.add_option("-v", dest="verbose", default=1, type="int", help="Verbose: 0 - off, 1 - on.")
   
   (options, args) = parser.parse_args()
 
