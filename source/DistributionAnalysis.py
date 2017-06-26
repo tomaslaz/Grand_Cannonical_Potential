@@ -230,8 +230,10 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
           
           # Pmm/Pm
-          #permutation2 = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
-          permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
+          if options.permCalc:
+            permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
+          else:
+            permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
           
           sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
         
