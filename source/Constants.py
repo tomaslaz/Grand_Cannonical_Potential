@@ -8,3 +8,5 @@ fig_dpi = 300
 
 fig_label_fontsize = 18
 fig_legend_fontsize = 14
+
+BIGEXPO = 30000

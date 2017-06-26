@@ -13,6 +13,7 @@ import Constants
 import sys
 import Utilities
 from Utilities import log
+import warnings
 
 # TODO: needs to made universal
 def calc_permutation(m, mm, _accuracy):
@@ -205,6 +206,8 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
     for mu_i in range(chem_pot_len):    
       mu = chem_pot_range[mu_i]
       
+      breakLoops = False
+      
       Wm_sum = _accuracy(0.0)
       for m_index in range(chem_pot_multi_len):
         
@@ -224,8 +227,14 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           # exponential term
           exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
           
-          exp_expr = _accuracy(np.exp(exp_expr_pow))
-
+          if ((exp_expr_pow > Constants.BIGEXPO) or (exp_expr_pow < -Constants.BIGEXPO)):
+            # the value of the exponential value is too damn high
+            breakLoops = True
+            break
+          
+          else:
+             exp_expr = _accuracy(np.exp(exp_expr_pow))
+          
           # Nm/Nmm
           attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
           
@@ -236,14 +245,18 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
             permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
           
           sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
-        
-        Wm_value = sum_top / sum_bottom
-        
-        Wm_sum += Wm_value
+          
+        if not breakLoops:
+          Wm_value = sum_top / sum_bottom
+            
+          Wm_sum += Wm_value
+        else:
+          Wm_value = 0
         
         Wm_array[t_i, mu_i, m_index] = Wm_value
       
       # Normalising
-      Wm_array[t_i, mu_i, :] /= Wm_sum
+      if Wm_sum != 0.0:
+        Wm_array[t_i, mu_i, :] /= Wm_sum
       
   return Wm_array
