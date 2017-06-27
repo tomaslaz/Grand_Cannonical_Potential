@@ -53,14 +53,10 @@ def calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
         min_energy = min_energies[m_index]
         
         sum2 += np.exp(-1.0*(min_energy - global_min_energy + m_value*mu_value) / (kT)) * delta_E_sums[m_index][t_index]
-      
-      print mu_value, sum2
-      
+            
       omega_value = global_min_energy - kT * np.log(sum2)
               
       omega_arr[t_index, mu_index] = omega_value
-  
-  print "omega_arr: ", omega_arr
   
   return success, error, omega_arr
 

@@ -1,7 +1,7 @@
 """
 @author Tomas Lazauskas, 2017
 
-A module for plotting the results out
+A module for plotting the results
 
 """
 
