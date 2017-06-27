@@ -53,7 +53,7 @@ def main(options, args):
   data_file = args[0]
   
   # reading in the data
-  success, error, names, permutations, chem_pot_multi, data = read_in_data(data_file, _accuracy, options)
+  success, error, names, permutations, chem_pot_multi, data = IO.read_in_data(data_file, _accuracy, options)
   
   if success:
     # grand cannonical analysis
@@ -62,37 +62,12 @@ def main(options, args):
   
   return success, error
 
-def read_in_data(data_file, _accuracy, options):
-  """
-  Reads in all the necessary data from the input file.
-  
-  """
-    
-  names = None
-  permutations = None
-  chem_pot_multi = None
-  data = None
-  
-  # reading in the energies
-  log(__name__, "Reading in data: %s" % (data_file), options.verbose, indent=1)
-  success, error, data = IO.read_data(data_file, _accuracy)
-  
-  # reading in the permutations
-  if success:
-    success, error, permutations = IO.read_line_values_as_array(data_file, _accuracy, line_no=2)
-  
-  # reading in chemical potential multipliers
-  if success:
-    success, error, chem_pot_multi = IO.read_line_values_as_array(data_file, _accuracy, line_no=3)
-      
-  return success, error, names, permutations, chem_pot_multi, data
-
 if __name__ == "__main__":
   
   # command line arguments and options
   options, args = cmd_line_args()
   
-  log(__name__, "Grand Cannonical Potential", options.verbose)
+  log(__name__, "Grand Canonical Potential", options.verbose)
   
   # the main routine
   success, error = main(options, args)

@@ -8,6 +8,7 @@ import numpy as np
 import sys
 
 import Constants
+from source.Utilities import log
 
 def check_file(file_path):
   """
@@ -16,6 +17,31 @@ def check_file(file_path):
   """
   
   return os.path.isfile(file_path)
+
+def read_in_data(data_file, _accuracy, options):
+  """
+  Reads in all the necessary data from the input file.
+  
+  """
+    
+  names = None
+  permutations = None
+  chem_pot_multi = None
+  data = None
+  
+  # reading in the energies
+  log(__name__, "Reading in data: %s" % (data_file), options.verbose, indent=1)
+  success, error, data = read_data(data_file, _accuracy)
+  
+  # reading in the permutations
+  if success:
+    success, error, permutations = read_line_values_as_array(data_file, _accuracy, line_no=2)
+  
+  # reading in chemical potential multipliers
+  if success:
+    success, error, chem_pot_multi = read_line_values_as_array(data_file, _accuracy, line_no=3)
+      
+  return success, error, names, permutations, chem_pot_multi, data
 
 def read_line_values_as_array(file_path, _accuracy, line_no):
   """
