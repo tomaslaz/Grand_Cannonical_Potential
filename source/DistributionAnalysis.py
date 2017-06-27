@@ -10,6 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 import Constants
+import source.IO as IO
 import sys
 import Utilities
 from Utilities import log
@@ -55,6 +56,12 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   Wm_array = prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
                         experiment_cnts, permutations, _accuracy, options)
   
+  # Writing Wm into a file
+  success, error = IO.write_Wm(temperatures, chem_pot_range, chem_pot_multi, Wm_array)
+  
+  if not success:
+    return success, error
+  
   # Plotting the Wm probabilities 3D plots
   dist_func_analysis_temp_mu_m_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
@@ -96,7 +103,6 @@ def dist_func_analysis_temp_mu_m_contour(temperatures, chem_pot_range, chem_pot_
       
     for tick in cbar.ax.yaxis.get_major_ticks():
       tick.label.set_fontsize(16) 
-      
       
     plt.xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
     

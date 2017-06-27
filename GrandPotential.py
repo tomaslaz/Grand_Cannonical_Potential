@@ -28,6 +28,8 @@ def cmd_line_args():
 
   parser.disable_interspersed_args()
   
+  parser.add_option("-o", "--output", dest="outputData", action="store_true", default=False, 
+    help="A flag to write the data into files")
   parser.add_option("-p", "--permutations", dest="permCalc", action="store_true", default=False, 
     help="Permutations will be calculated instead of read from the data file. User must modify: DistributionAnalysis.calc_permutation")
   parser.add_option('-t', dest="temps", default="1", help="List of temperatures separated by a comma (default: T=0)")

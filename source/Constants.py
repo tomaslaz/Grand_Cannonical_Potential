@@ -10,3 +10,6 @@ fig_label_fontsize = 18
 fig_legend_fontsize = 14
 
 BIGEXPO = 1000
+
+# I/O
+wm_results_filename = "wm_results.csv"

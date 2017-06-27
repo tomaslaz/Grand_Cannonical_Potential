@@ -7,6 +7,8 @@ Input/output module.
 import numpy as np
 import sys
 
+import Constants
+
 def check_file(file_path):
   """
   Checks if file exists.
@@ -123,3 +125,55 @@ def read_permutations(file_path, _accuracy):
     f.close()
     
   return success, error, permutations
+
+def write_Wm(temperatures, chem_pot_range, chem_pot_multi, Wm_array):
+  """
+  Writes the Wm array into a csv file
+  
+  """
+  
+  success = True
+  error = ""
+  
+  try:
+    fout = open(Constants.wm_results_filename, "w")
+  except:
+    success = False
+    error = __name__ + ": Cannot open: " + filePath
+    
+    return success, error
+  
+  temp_len = len(temperatures)
+  chem_pot_len = len(chem_pot_range)
+  chem_pot_multi_len = len(chem_pot_multi)
+  
+  # first column is dedicated for the value of m
+  fout.write(",")
+  
+  # writing mu values as header
+  for mu_idx in range(chem_pot_len-1):
+    fout.write("%f," % (chem_pot_range[mu_idx]))
+    
+  fout.write("%f\n" % (chem_pot_range[chem_pot_len-1]))
+  
+  # for each temperature:
+  for t_i in range(temp_len):
+    
+    # writing temperature
+    temperature = temperatures[t_i]
+    fout.write("%f\n" % (temperature))
+    
+    # writing probabilities
+    for m_index in range(chem_pot_multi_len):
+      
+      # writing the value of m
+      fout.write("%f" % (chem_pot_multi[m_index]))
+      
+      for mu_idx in range(chem_pot_len):
+        fout.write(",%e" % (Wm_array[t_i, mu_idx, m_index]))
+      
+      fout.write("\n")
+          
+  fout.close()
+    
+  return success, error
