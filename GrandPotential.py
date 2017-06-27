@@ -4,11 +4,8 @@
 
 """
 
-#import copy
-#import math
 import numpy as np
 from optparse import OptionParser
-#import sys
 
 import source.IO as IO
 import source.GrandC as GrandC
@@ -56,7 +53,7 @@ def main(options, args):
   success, error, names, permutations, chem_pot_multi, data = IO.read_in_data(data_file, _accuracy, options)
   
   if success:
-    # grand cannonical analysis
+    # grand canonical analysis
     log(__name__, "Performing the grand canonical analysis", options.verbose, indent=1)
     success, error = GrandC.perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, _accuracy, options)
   
