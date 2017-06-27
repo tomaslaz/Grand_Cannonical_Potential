@@ -13,3 +13,4 @@ BIGEXPO = 1000
 
 # I/O
 wm_results_filename = "wm_results.csv"
+avg_plot_filename = "avg_%s.png"

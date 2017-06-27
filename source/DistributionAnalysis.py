@@ -42,18 +42,19 @@ def calc_permutation(m, mm, _accuracy):
 
 def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
   """
-  Performs average analysis on a sleceted property
+  Performs average analysis on a selected property
   
   """
   
   # Calculates the average values
   success, error, avg_array = calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, 
                                                  Wm_array, _accuracy, options)
-  
+    
   if not success:
     return success, error
   
   # Plots the average values
+  Graphs.avg_values(temperatures, chem_pot_range, avg_array, prop_name, _accuracy, options)
   
   return success, error
 
@@ -87,7 +88,7 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
         
         prop_avg += wm_value * prop_array[prop_index]
       
-      Wm_array[t_index, mu_index] = prop_avg
+      avg_array[t_index, mu_index] = prop_avg
 
   return success, error, avg_array
 
