@@ -13,16 +13,28 @@ import Constants
 import Utilities
 from Utilities import log
 
+def _setup_temperature_legend(ax):
+  """
+  Sets up a legend for temperatures
+  
+  """
+  
+  lg = ax.legend(loc=3, bbox_to_anchor=(0.,1.02,1.,0.102),
+                 title="Temperature (K)", ncol=5, fontsize=Constants.fig_legend_fontsize, mode="expand", borderaxespad=0.)
+  
+  lg.get_frame().set_alpha(0.5)
+  lg.get_title().set_fontsize('%d' % (Constants.fig_label_fontsize))
+  
 def avg_values(temperatures, chem_pot_range, avg_array, prop_name, _accuracy, options):
   """
   Plots average values with respect with mu and temperature
   
   """
   
-  temp_len = len(temperatures)
-  
   fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
   ax = fig.add_subplot(1,1,1)
+  
+  temp_len = len(temperatures)
   
   # for each temperature:
   for t_index in range(temp_len):
@@ -37,10 +49,8 @@ def avg_values(temperatures, chem_pot_range, avg_array, prop_name, _accuracy, op
   ax.set_xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
   ax.set_ylabel(r'$<%s>$' % (prop_name), fontsize=Constants.fig_label_fontsize)
   
-  lg = ax.legend(loc=3, bbox_to_anchor=(0.,1.02,1.,0.102),
-        title="Temperature (K)", ncol=5, fontsize=Constants.fig_legend_fontsize, mode="expand", borderaxespad=0.)
-  lg.get_frame().set_alpha(0.5)
-  lg.get_title().set_fontsize('%d' % (Constants.fig_label_fontsize))
+  # place the legend
+  _setup_temperature_legend(ax)
   
   fig.savefig(Constants.avg_plot_filename % (prop_name), dpi=Constants.fig_dpi, bbox_inches='tight')
   
@@ -108,10 +118,10 @@ def omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options):
   
   """
   
-  temp_len = len(temperatures)
-  
   fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
   ax = fig.add_subplot(1,1,1)
+  
+  temp_len = len(temperatures)
   
   # for each temperature:
   for t_index in range(temp_len):
@@ -126,10 +136,8 @@ def omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options):
   ax.set_xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
   ax.set_ylabel(r'$\Omega$', fontsize=Constants.fig_label_fontsize)
   
-  lg = ax.legend(loc=3, bbox_to_anchor=(0.,1.02,1.,0.102),
-        title="Temperature (K)", ncol=5, fontsize=Constants.fig_legend_fontsize, mode="expand", borderaxespad=0.)
-  lg.get_frame().set_alpha(0.5)
-  lg.get_title().set_fontsize('%d' % (Constants.fig_label_fontsize))
+   # place the legend
+  _setup_temperature_legend(ax)
   
   fig.savefig(Constants.omega_mu_plot_filename, dpi=Constants.fig_dpi, bbox_inches='tight')
   
