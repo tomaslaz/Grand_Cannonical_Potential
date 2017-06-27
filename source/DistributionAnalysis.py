@@ -40,12 +40,65 @@ def calc_permutation(m, mm, _accuracy):
   
   return value
 
+def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
+  """
+  Performs average analysis on a sleceted property
+  
+  """
+  
+  # Calculates the average values
+  success, error, avg_array = calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, 
+                                                 Wm_array, _accuracy, options)
+  
+  if not success:
+    return success, error
+  
+  # Plots the average values
+  
+  return success, error
+
+def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
+  """
+  Calculates average value of a system's property
+  
+  """
+  
+  success = True
+  error = ""
+  
+  log(__name__, "Calculating an average value of: %s" % (prop_name), options.verbose, indent=3)
+    
+  temp_len = len(temperatures)
+  chem_pot_len = len(chem_pot_range)
+  prop_len = len(prop_array)
+  
+  avg_array = np.zeros([temp_len, chem_pot_len], _accuracy)
+  
+  # for each temperature:
+  for t_index in range(temp_len):
+    temperature = temperatures[t_index]
+    
+    for mu_index in range(chem_pot_len):   
+      
+      prop_avg = _accuracy(0.0)
+      
+      for prop_index in range(prop_len):
+        wm_value = Wm_array[t_index, mu_index, prop_index]
+        
+        prop_avg += wm_value * prop_array[prop_index]
+      
+      Wm_array[t_index, mu_index] = prop_avg
+
+  return success, error, avg_array
+
 def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
                         experiment_cnts, permutations, _accuracy, options):
   """
   Performs the distribution analysis: evaluates Wm and plots it against m and mu.
   
   """
+  
+  log(__name__, "Distribution analysis", options.verbose, indent=2)
   
   success = True
   error = ""
@@ -58,12 +111,15 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   success, error = IO.write_Wm(temperatures, chem_pot_range, chem_pot_multi, Wm_array)
   
   if not success:
-    return success, error
+    return success, error, Wm_array
   
   # Plotting the Wm probabilities 3D plots
   Graphs.wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
-  return success, error
+  # Performing analysis with respect to the distribution function (average m is the standard analysis)
+  average_analysis(temperatures, chem_pot_range, chem_pot_multi, "m", Wm_array, _accuracy, options)
+  
+  return success, error, Wm_array
     
 def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
                permutations, _accuracy, options):

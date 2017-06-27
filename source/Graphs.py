@@ -50,9 +50,7 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
       tick.label.set_fontsize(16) 
       
     plt.xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
-    
     plt.ylabel(r'$<m>$', fontsize = Constants.fig_label_fontsize)
-      
     plt.title("T = %d K" % (temperature), fontsize = Constants.fig_legend_fontsize)
     
     ax = plt.gca()

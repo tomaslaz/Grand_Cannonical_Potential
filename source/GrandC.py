@@ -56,7 +56,7 @@ def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, 
   # Perform chemical potential analysis
   if chem_pot_analysis:
     # performs distribution analysis    
-    success, error = DistributionAnalysis.distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, 
+    success, error, Wm_array = DistributionAnalysis.distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, 
                                            min_energies, delta_E_sums, experiment_cnts, permutations, _accuracy, options)
       
   if not success:
