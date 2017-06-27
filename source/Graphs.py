@@ -101,3 +101,38 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
     # clearing the figure settings   
     plt.clf()
     plt.close()
+
+def omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options):
+  """
+  Plots omega with respect with mu and temperature
+  
+  """
+  
+  temp_len = len(temperatures)
+  
+  fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
+  ax = fig.add_subplot(1,1,1)
+  
+  # for each temperature:
+  for t_index in range(temp_len):
+    temperature = temperatures[t_index]
+  
+    colour = Utilities.get_temperature_colour(temperature)
+    
+    ax.plot(chem_pot_range, omega_arr[t_index, :], color=colour, linewidth=1.5, label="%.2d" % (temperature))
+    
+  plt.grid()
+  
+  ax.set_xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
+  ax.set_ylabel(r'$\Omega$', fontsize=Constants.fig_label_fontsize)
+  
+  lg = ax.legend(loc=3, bbox_to_anchor=(0.,1.02,1.,0.102),
+        title="Temperature (K)", ncol=5, fontsize=Constants.fig_legend_fontsize, mode="expand", borderaxespad=0.)
+  lg.get_frame().set_alpha(0.5)
+  lg.get_title().set_fontsize('%d' % (Constants.fig_label_fontsize))
+  
+  fig.savefig(Constants.omega_mu_plot_filename, dpi=Constants.fig_dpi, bbox_inches='tight')
+  
+  # clearing the figure settings   
+  plt.clf()
+  plt.close()

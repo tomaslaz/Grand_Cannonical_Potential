@@ -12,5 +12,12 @@ fig_legend_fontsize = 14
 BIGEXPO = 1000
 
 # I/O
+# data
 wm_results_filename = "wm_results.csv"
+
+# graphs
 avg_plot_filename = "avg_%s.png"
+omega_mu_plot_filename = "omega_mu.png"
+
+# Grand potential analysis
+omega_energy_coeficient = 1.0

@@ -11,6 +11,7 @@ import sys
 
 import Constants
 import DistributionAnalysis
+import OmegaAnalysis
 import Utilities
 from Utilities import log
   
@@ -58,9 +59,13 @@ def perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, 
     # performs distribution analysis    
     success, error, Wm_array = DistributionAnalysis.distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, 
                                            min_energies, delta_E_sums, experiment_cnts, permutations, _accuracy, options)
-      
-  if not success:
-    return success, error
+    
+    if not success:
+      return success, error
+    
+    # perform omega analysis
+    success, error = OmegaAnalysis.omega_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
+                                 experiment_cnts, permutations, _accuracy, options)
   
   return success, error
 
