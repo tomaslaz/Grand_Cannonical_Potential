@@ -74,7 +74,7 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
   prop_len = len(prop_array)
   
   avg_array = np.zeros([temp_len, chem_pot_len], _accuracy)
-  
+    
   # for each temperature:
   for t_index in range(temp_len):
     temperature = temperatures[t_index]
@@ -88,7 +88,7 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
         
         prop_avg += wm_value * prop_array[prop_index]
       
-      Wm_array[t_index, mu_index] = prop_avg
+      avg_array[t_index, mu_index] = prop_avg
 
   return success, error, avg_array
 

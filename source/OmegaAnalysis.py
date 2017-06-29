@@ -46,12 +46,12 @@ def calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
       
       sum2 = _accuracy(0.0)
       
-      # for each stoichiometry
+      # for each composition
       for m_index in range(chem_pot_multi_len):
         m_value = chem_pot_multi[m_index]
         
         min_energy = min_energies[m_index]
-             
+        
         sum2 += np.exp(-1.0*(min_energy - global_min_energy + m_value*mu_value) / (kT)) * delta_E_sums[m_index][t_index]
             
       omega_value = global_min_energy - kT * np.log(sum2)
@@ -79,6 +79,7 @@ def omega_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, d
   if not success:
     return success, error
   
+  # plot omega over mu
   Graphs.omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options)
 
   return success, error
