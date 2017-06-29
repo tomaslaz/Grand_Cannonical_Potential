@@ -7,6 +7,15 @@ Utilities module.
 import datetime
 import numpy as np
 
+def frange(x, y, jump):
+  frange_arr = []
+  
+  while x < y:
+    frange_arr.append(x)
+    x += jump
+  
+  return frange_arr
+
 def factorial_division(up_fac, down_fac, _accuracy):
   """
   Calculates a division of two factorials

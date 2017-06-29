@@ -49,7 +49,7 @@ def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_arr
   # Calculates the average values
   success, error, avg_array = calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, 
                                                  Wm_array, _accuracy, options)
-    
+  
   if not success:
     return success, error
   
@@ -88,7 +88,7 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
         
         prop_avg += wm_value * prop_array[prop_index]
       
-      avg_array[t_index, mu_index] = prop_avg
+      Wm_array[t_index, mu_index] = prop_avg
 
   return success, error, avg_array
 
@@ -143,8 +143,6 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
     for mu_i in range(chem_pot_len):    
       mu = chem_pot_range[mu_i]
       
-      breakLoops = False
-      
       Wm_sum = _accuracy(0.0)
       for m_index in range(chem_pot_multi_len):
         
@@ -167,38 +165,39 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           # the power of the exponential term
           exp_powers[mm_index] = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
         
+        breakLoops = False
+        
         for mm_index in range(chem_pot_multi_len):
-          if mm_index != m_index:
-            
-            mm_value = chem_pot_multi[mm_index]
-            Emin_mm = min_energies[mm_index]
-            
-            # exponential term
-            exp_expr_pow = exp_powers[mm_index]
-                        
-            if (exp_expr_pow > Constants.BIGEXPO):
-              # the value of the exponential power is too damn high
-              breakLoops = True              
-              break
-            
-            elif exp_expr_pow < -Constants.BIGEXPO:
-              exp_expr = 0.0
-            else:
-               exp_expr = _accuracy(np.exp(exp_expr_pow))
-            
-            # Nm/Nmm
-            attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
-            
-            # Pmm/Pm
-            if options.permCalc:
-              permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
-            else:
-              permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
-            
-            sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
+
+          mm_value = chem_pot_multi[mm_index]
+          Emin_mm = min_energies[mm_index]
           
+          # exponential term
+          exp_expr_pow = exp_powers[mm_index]
+                      
+          if (exp_expr_pow > Constants.BIGEXPO):
+            # the value of the exponential power is too damn high
+            breakLoops = True              
+            break
+
+          else:
+            exp_expr = _accuracy(np.exp(exp_expr_pow))
+          
+          exp_expr = _accuracy(np.exp(exp_expr_pow))
+          
+          # Nm/Nmm
+          attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
+          
+          # Pmm/Pm
+          if options.permCalc:
+            permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
+          else:
+            permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
+          
+          sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
+            
         if not breakLoops:
-          
+           
           if sum_bottom == 0.0:
             Wm_value = 1.1
           else:
@@ -207,7 +206,7 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           Wm_sum += Wm_value
         else:
           Wm_value = 0
-
+         
         Wm_array[t_i, mu_i, m_index] = Wm_value
        
       # Normalising
