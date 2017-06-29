@@ -8,7 +8,7 @@ import numpy as np
 from optparse import OptionParser
 
 import source.IO as IO
-import source.GrandC as GrandC
+import source.GrandPotential as GrandPotential
 from source.Utilities import log
 
 _accuracy = np.float128
@@ -55,7 +55,7 @@ def main(options, args):
   if success:
     # grand canonical analysis
     log(__name__, "Performing the grand canonical analysis", options.verbose, indent=1)
-    success, error = GrandC.perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, _accuracy, options)
+    success, error = GrandPotential.perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, _accuracy, options)
   
   return success, error
 
