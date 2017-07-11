@@ -7,6 +7,8 @@
 import numpy as np
 from optparse import OptionParser
 
+import source.Canonical as Canonical
+import source.Data as Data
 import source.IO as IO
 import source.GrandPotential as GrandPotential
 from source.Utilities import log
@@ -53,9 +55,24 @@ def main(options, args):
   success, error, names, permutations, chem_pot_multi, data = IO.read_in_data(data_file, _accuracy, options)
   
   if success:
+    # prepare analysis parameters
+    success, error, temperatures, chem_pot_range =  Data.prepare_parameters(options)
+  
+  if success:
+    # prepare the data
+    energies, min_energies, shifted_energies, experiment_cnts, delta_E_sums = Data.prepare_data(data, temperatures, _accuracy, options)
+  
+  if success:
+    # canonical analysis
+    log(__name__, "Performing the canonical analysis", options.verbose, indent=1)
+    success, error = Canonical.perform_canonical_analysis(names, permutations, data, _accuracy, options)
+    
+  if success and chem_pot_range is not None:
     # grand canonical analysis
     log(__name__, "Performing the grand canonical analysis", options.verbose, indent=1)
-    success, error = GrandPotential.perform_grand_canonical_analysis(names, permutations, chem_pot_multi, data, _accuracy, options)
+    success, error = GrandPotential.perform_grand_canonical_analysis(permutations, chem_pot_multi, temperatures, 
+                                                                     chem_pot_range, min_energies, delta_E_sums, 
+                                                                     experiment_cnts, _accuracy, options)
   
   return success, error
 

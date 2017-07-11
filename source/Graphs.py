@@ -86,7 +86,7 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
 
     Z = Wm_array[t_i, :, :]
   
-    contour_filled = plt.contourf(Y, X, Z, levels, cmap=cmap, interpolation='bilinear', vmax=1.1, vmin=0.0, alpha=0.95)
+    contour_filled = plt.contourf(X, Y, Z, levels, cmap=cmap, interpolation='bilinear', vmax=1.1, vmin=0.0, alpha=0.95)
     
     cbar = plt.colorbar(contour_filled, ticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
     cbar.ax.tick_params(labelsize=16) 
@@ -95,8 +95,8 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
     for tick in cbar.ax.yaxis.get_major_ticks():
       tick.label.set_fontsize(16) 
       
-    plt.xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
-    plt.ylabel(r'$<m>$', fontsize = Constants.fig_label_fontsize)
+    plt.xlabel(r'$m$', fontsize = Constants.fig_label_fontsize)
+    plt.ylabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
     plt.title("T = %d K" % (temperature), fontsize = Constants.fig_legend_fontsize)
     
     ax = plt.gca()
