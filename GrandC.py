@@ -65,7 +65,9 @@ def main(options, args):
   if success:
     # canonical analysis
     log(__name__, "Performing the canonical analysis", options.verbose, indent=1)
-    success, error = Canonical.perform_canonical_analysis(names, permutations, data, _accuracy, options)
+    success, error = Canonical.perform_canonical_analysis(chem_pot_multi, names, 
+                                                          permutations, temperatures, min_energies, delta_E_sums, 
+                                                          experiment_cnts, _accuracy, options)
     
   if success and chem_pot_range is not None:
     # grand canonical analysis

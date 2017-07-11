@@ -14,17 +14,84 @@ import Graphs
 import Utilities
 from Utilities import log
 
-def calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
+def c_calc_omega(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, _accuracy, options):
+  """
+  Calculates omega values with respect to temperature (canonical analysis)
+  
+  """
+  
+  success = True
+  error = ""
+  
+  log(__name__, "Calculating Omega (canonical)", options.verbose, indent=3)
+  
+  temp_len = len(temperatures)
+  comp_len = len(min_energies)
+  
+  omega_arr = np.zeros([temp_len, comp_len], _accuracy)
+  
+  # for each temperature:
+  for t_index in range(temp_len):
+    temperature = temperatures[t_index]
+    
+    kT = np.longdouble(Constants.kB * temperature)
+    # for each composition
+    
+    for c_index in range(comp_len):
+      # calculating Z^c_m
+      
+      # Pm
+      if options.permCalc:
+        Pm = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
+      else:
+        Pm = _accuracy(permutations[c_index])         
+      
+      # Nm
+      Nm = experiment_cnts[c_index]
+      
+      Z_cm = np.exp(-1.0*(min_energies[c_index]) / kT) * (Pm/Nm) * delta_E_sums[c_index][t_index]
+      
+      omega_value = - kT * np.log(Z_cm)
+      
+      omega_arr[t_index, c_index] = omega_value
+      
+  return success, error, omega_arr
+
+def c_omega_analysis(chem_pot_multi, names, temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
+                     _accuracy, options):
+  """
+  Performs the canonical analysis.
+  
+  """
+  
+  success = True
+  error = ""
+  
+  log(__name__, "Omega analysis (canonical)", options.verbose, indent=2)
+  
+  # calculates omega values
+  success, error, omega_arr = c_calc_omega(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
+                                           _accuracy, options)
+  
+  if not success:
+    return success, error
+  
+  # plot omega with respect to temperature
+  Graphs.c_omega(chem_pot_multi, names, temperatures, omega_arr, _accuracy, options)
+
+  return success, error
+
+def g_c_calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
                    permutations, _accuracy, options):
   """
-  Calculates omega values with respect to temperature and chemical potential
+  Calculates omega values with respect to temperature and chemical potential (grand canonical analysis)
   
   """
     
   success = True
   error = ""
   
-  log(__name__, "Calculating Omega", options.verbose, indent=3)
+  log(__name__, "Calculating Omega (grand canonical)", options.verbose, indent=3)
   
   temp_len = len(temperatures)
   chem_pot_len = len(chem_pot_range)
@@ -60,7 +127,7 @@ def calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
   
   return success, error, omega_arr
 
-def omega_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
+def g_c_omega_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
                    permutations, _accuracy, options):
   """
   Performs the grand potential analysis.
@@ -70,16 +137,16 @@ def omega_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, d
   success = True
   error = ""
   
-  log(__name__, "Omega analysis", options.verbose, indent=2)
+  log(__name__, "Omega analysis (grand canonical)", options.verbose, indent=2)
   
   # calculates omega values
-  success, error, omega_arr = calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
+  success, error, omega_arr = g_c_calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
                                          experiment_cnts, permutations, _accuracy, options)
   
   if not success:
     return success, error
   
   # plot omega over mu
-  Graphs.omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options)
+  Graphs.c_g_omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options)
 
   return success, error

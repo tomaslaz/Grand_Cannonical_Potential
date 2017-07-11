@@ -33,6 +33,9 @@ def read_in_data(data_file, _accuracy, options):
   log(__name__, "Reading in data: %s" % (data_file), options.verbose, indent=1)
   success, error, data = read_data(data_file, _accuracy)
   
+  if success:
+    success, error, names = read_line_values_as_string_array(data_file, line_no=1)
+  
   # reading in the permutations
   if success:
     success, error, permutations = read_line_values_as_array(data_file, _accuracy, line_no=2)
@@ -43,7 +46,7 @@ def read_in_data(data_file, _accuracy, options):
       
   return success, error, names, permutations, chem_pot_multi, data
 
-def read_line_values_as_array(file_path, _accuracy, line_no):
+def read_line_values_as_array(file_path, dtype, line_no):
   """
   Reads in chemical potential multipliers
   
@@ -74,10 +77,55 @@ def read_line_values_as_array(file_path, _accuracy, line_no):
         array = line.split(",")
         array_cnt = len(array)
               
-        values = np.empty([array_cnt], dtype=_accuracy)
+        values = np.empty([array_cnt], dtype=dtype)
         
         for i in range(array_cnt):
-          values[i] = _accuracy(array[i].strip())
+          values[i] = dtype(array[i].strip())
+
+      elif line_cnt > 1:
+        break
+      
+      line_cnt += 1
+      
+    f.close()
+  
+  return success, error, values
+
+def read_line_values_as_string_array(file_path, line_no):
+  """
+  Reads in chemical potential multipliers
+  
+  """
+  
+  success = True
+  error = ""
+  values = None
+  
+  if not check_file:
+    success = False
+    error = "File: %s cannot be found." % (file_path)
+  
+  else:
+    
+    try:
+      f = open(file_path)
+      
+    except:
+      success = False
+      error = "File: %s cannot be opened." % (file_path)
+      return success, error, values
+    
+    line_cnt = 0
+    for line in f:
+      if line_cnt == (line_no-1):
+        
+        array = line.split(",")
+        array_cnt = len(array)
+              
+        values = []
+        
+        for i in range(array_cnt):
+          values.append(array[i].strip())
 
       elif line_cnt > 1:
         break

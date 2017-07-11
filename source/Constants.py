@@ -8,6 +8,7 @@ fig_dpi = 300
 
 fig_label_fontsize = 18
 fig_legend_fontsize = 14
+fig_ticklabel_fontsize = 10
 
 BIGEXPO = 1000
 
@@ -17,7 +18,8 @@ wm_results_filename = "wm_results.csv"
 
 # graphs
 avg_plot_filename = "avg_%s.png"
-omega_mu_plot_filename = "omega_mu.png"
+omega_mu_plot_filename = "c_g_omega_mu.png"
+omega_plot_filename = "c_omega_mu.png"
 
 # Grand potential analysis
 omega_energy_coeficient = 1.0

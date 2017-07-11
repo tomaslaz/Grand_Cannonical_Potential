@@ -21,22 +21,25 @@ def calc_permutation(m, mm, _accuracy):
   
   """
   
-  cat_sites = 108
-  an_sites = 216
+  # This is a test case for YZrO system
+#   cat_sites = 108
+#   an_sites = 216
+#   
+#   up_fac = cat_sites - 2*m
+#   down_fac = cat_sites - 2*mm
+#   
+#   value = Utilities.factorial_division(up_fac, down_fac, _accuracy)
+#   
+#   value *= Utilities.factorial_division(2*m, 2*mm, _accuracy)
+#   
+#   up_fac = an_sites - m
+#   down_fac = an_sites - mm
+#   
+#   value *= Utilities.factorial_division(up_fac, down_fac, _accuracy)
+#   
+#   value *= Utilities.factorial_division(m, mm, _accuracy)
   
-  up_fac = cat_sites - 2*m
-  down_fac = cat_sites - 2*mm
-  
-  value = Utilities.factorial_division(up_fac, down_fac, _accuracy)
-  
-  value *= Utilities.factorial_division(2*m, 2*mm, _accuracy)
-  
-  up_fac = an_sites - m
-  down_fac = an_sites - mm
-  
-  value *= Utilities.factorial_division(up_fac, down_fac, _accuracy)
-  
-  value *= Utilities.factorial_division(m, mm, _accuracy)
+  value = 1
   
   return value
 

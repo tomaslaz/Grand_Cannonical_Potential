@@ -58,6 +58,73 @@ def avg_values(temperatures, chem_pot_range, avg_array, prop_name, _accuracy, op
   plt.clf()
   plt.close()
 
+def c_g_omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options):
+  """
+  Plots omega with respect with mu and temperature
+  
+  """
+  
+  fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
+  ax = fig.add_subplot(1,1,1)
+  
+  temp_len = len(temperatures)
+  
+  # for each temperature:
+  for t_index in range(temp_len):
+    temperature = temperatures[t_index]
+  
+    colour = Utilities.get_temperature_colour(temperature)
+    
+    ax.plot(chem_pot_range, omega_arr[t_index, :], color=colour, linewidth=1.5, label="%.2d" % (temperature))
+    
+  plt.grid()
+  
+  ax.set_xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
+  ax.set_ylabel(r'$\Omega$', fontsize=Constants.fig_label_fontsize)
+  
+   # place the legend
+  _setup_temperature_legend(ax)
+  
+  fig.savefig(Constants.omega_mu_plot_filename, dpi=Constants.fig_dpi, bbox_inches='tight')
+  
+  # clearing the figure settings   
+  plt.clf()
+  plt.close()
+
+def c_omega(chem_pot_multi, names, temperatures, omega_arr, _accuracy, options):
+  """
+  """
+  
+  fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
+  ax = fig.add_subplot(1,1,1)
+  
+  temp_len = len(temperatures)
+  
+  # for each temperature:
+  for t_index in range(temp_len):
+    temperature = temperatures[t_index]
+  
+    colour = Utilities.get_temperature_colour(temperature)
+  
+    ax.plot(chem_pot_multi, omega_arr[t_index, :], color=colour, linewidth=1.5, label="%.2d" % (temperature))
+  
+  plt.grid()
+  
+  ax.set_xlabel(r'$m$', fontsize = Constants.fig_label_fontsize)
+  ax.set_ylabel(r'$\gamma^{c}_{m}$', fontsize=Constants.fig_label_fontsize)
+  
+  # x axis ticklabels
+  plt.xticks(chem_pot_multi, names, rotation=30, fontsize = Constants.fig_ticklabel_fontsize)
+  
+  # place the legend
+  _setup_temperature_legend(ax)
+  
+  fig.savefig(Constants.omega_plot_filename, dpi=Constants.fig_dpi, bbox_inches='tight')
+  
+  # clearing the figure settings   
+  plt.clf()
+  plt.close()
+
 def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
   """
   Plots distribution functions in terms of m and mu with respect to the temperature
@@ -111,36 +178,3 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
     # clearing the figure settings   
     plt.clf()
     plt.close()
-
-def omega_over_mu(temperatures, chem_pot_range, omega_arr, _accuracy, options):
-  """
-  Plots omega with respect with mu and temperature
-  
-  """
-  
-  fig = plt.figure(figsize=(Constants.fig_size_x, Constants.fig_size_y))
-  ax = fig.add_subplot(1,1,1)
-  
-  temp_len = len(temperatures)
-  
-  # for each temperature:
-  for t_index in range(temp_len):
-    temperature = temperatures[t_index]
-  
-    colour = Utilities.get_temperature_colour(temperature)
-    
-    ax.plot(chem_pot_range, omega_arr[t_index, :], color=colour, linewidth=1.5, label="%.2d" % (temperature))
-    
-  plt.grid()
-  
-  ax.set_xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
-  ax.set_ylabel(r'$\Omega$', fontsize=Constants.fig_label_fontsize)
-  
-   # place the legend
-  _setup_temperature_legend(ax)
-  
-  fig.savefig(Constants.omega_mu_plot_filename, dpi=Constants.fig_dpi, bbox_inches='tight')
-  
-  # clearing the figure settings   
-  plt.clf()
-  plt.close()
