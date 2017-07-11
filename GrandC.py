@@ -61,13 +61,13 @@ def main(options, args):
   if success:
     # prepare the data
     energies, min_energies, shifted_energies, experiment_cnts, delta_E_sums = Data.prepare_data(data, temperatures, _accuracy, options)
-  
+    
   if success:
     # canonical analysis
     log(__name__, "Performing the canonical analysis", options.verbose, indent=1)
     success, error = Canonical.perform_canonical_analysis(chem_pot_multi, names, 
                                                           permutations, temperatures, min_energies, delta_E_sums, 
-                                                          experiment_cnts, _accuracy, options)
+                                                          experiment_cnts, shifted_energies, _accuracy, options)
     
   if success and chem_pot_range is not None:
     # grand canonical analysis

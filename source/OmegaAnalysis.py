@@ -14,7 +14,7 @@ import Graphs
 import Utilities
 from Utilities import log
 
-def c_calc_omega(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, _accuracy, options):
+def c_calc_gamma(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, _accuracy, options):
   """
   Calculates omega values with respect to temperature (canonical analysis)
   
@@ -57,7 +57,7 @@ def c_calc_omega(temperatures, min_energies, delta_E_sums, experiment_cnts, perm
       
   return success, error, omega_arr
 
-def c_omega_analysis(chem_pot_multi, names, temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
+def c_gamma_analysis(chem_pot_multi, names, temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
                      _accuracy, options):
   """
   Performs the canonical analysis.
@@ -70,7 +70,7 @@ def c_omega_analysis(chem_pot_multi, names, temperatures, min_energies, delta_E_
   log(__name__, "Omega analysis (canonical)", options.verbose, indent=2)
   
   # calculates omega values
-  success, error, omega_arr = c_calc_omega(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
+  success, error, omega_arr = c_calc_gamma(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
                                            _accuracy, options)
   
   if not success:

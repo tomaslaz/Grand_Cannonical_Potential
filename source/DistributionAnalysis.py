@@ -124,7 +124,39 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   average_analysis(temperatures, chem_pot_range, chem_pot_multi, "m", Wm_array, _accuracy, options)
   
   return success, error, Wm_array
+
+def distribution_analysis_canonical(temperatures, experiment_cnts, shifted_energies, delta_E_sums, _accuracy, options):
+  """
+  
+  
+  """
+  
+  log(__name__, "Distribution analysis (canonical)", options.verbose, indent=2)
+  
+  success = True
+  error = ""
+  
+  temp_len = len(temperatures)
+  comp_len = len(experiment_cnts)
+  max_experiment_cnt = np.int32(np.max(experiment_cnts))
+  
+  Wm_array = np.zeros([temp_len, comp_len, max_experiment_cnt], _accuracy)
+  
+  # for each temperature
+  for t_i in range(temp_len):
+    kT = np.longdouble(Constants.kB * temperatures[t_i])
     
+    # for each discrete composition
+    for comp_i in range(comp_len):
+      
+      # for each experiment
+      for exp_i in range(experiment_cnts[comp_i]):
+                
+        exp_expr_pow = -1.0 * shifted_energies[comp_i][exp_i] / kT
+        Wm_array[t_i, comp_i, exp_i] = np.exp(exp_expr_pow) / delta_E_sums[comp_i, t_i]
+  
+  return success, error, Wm_array
+
 def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
                permutations, _accuracy, options):
   """
