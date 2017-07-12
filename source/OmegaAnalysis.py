@@ -53,7 +53,7 @@ def c_calc_gamma(temperatures, min_energies, delta_E_sums, experiment_cnts, perm
       
       omega_value = - kT * np.log(Z_cm)
       
-      omega_arr[t_index, c_index] = omega_value
+      omega_arr[t_index, c_index] = omega_value / Constants.gamma_c_m_coef
       
   return success, error, omega_arr
 

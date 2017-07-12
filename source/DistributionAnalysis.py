@@ -127,7 +127,7 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
 
 def distribution_analysis_canonical(temperatures, experiment_cnts, shifted_energies, delta_E_sums, _accuracy, options):
   """
-  
+  Evaluates Wm with respect to temperature
   
   """
   
