@@ -119,9 +119,11 @@ def g_c_calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, d
         
         min_energy = min_energies[m_index]
         
-        sum2 += np.exp(-1.0*(min_energy - global_min_energy + m_value*mu_value) / (kT)) * delta_E_sums[m_index][t_index]
+        exp_expr = _accuracy(-1.0*(min_energy - global_min_energy + m_value*mu_value) / (kT))
+        
+        sum2 += np.exp(exp_expr) * (permutations[m_index]/experiment_cnts[m_index]) * delta_E_sums[m_index][t_index]
             
-      omega_value = global_min_energy - kT * np.log(sum2)
+      omega_value = -kT * (-global_min_energy + np.log(sum2))
               
       omega_arr[t_index, mu_index] = omega_value
   
