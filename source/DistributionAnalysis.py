@@ -25,7 +25,7 @@ def calc_permutation(m, mm, _accuracy):
   
   return value
 
-def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
+def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options, temp_depend=False):
   """
   Performs average analysis on a selected property
   
@@ -33,7 +33,7 @@ def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_arr
   
   # Calculates the average values
   success, error, avg_array = calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, 
-                                                 Wm_array, _accuracy, options)
+                                                 Wm_array, _accuracy, options, temp_depend=temp_depend)
   
   if not success:
     return success, error
@@ -43,7 +43,7 @@ def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_arr
   
   return success, error
 
-def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
+def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options, temp_depend=False):
   """
   Calculates average value of a system's property
   
@@ -56,7 +56,12 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
     
   temp_len = len(temperatures)
   chem_pot_len = len(chem_pot_range)
-  prop_len = len(prop_array)
+  
+  # is the value temperature dependent
+  if not temp_depend:
+    prop_len = len(prop_array)
+  else:
+    prop_len = len(prop_array[0])
   
   avg_array = np.zeros([temp_len, chem_pot_len], _accuracy)
     
@@ -71,14 +76,20 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
       for prop_index in range(prop_len):
         wm_value = Wm_array[t_index, mu_index, prop_index]
         
-        prop_avg += wm_value * prop_array[prop_index]
+        # is the value temperature dependent
+        if not temp_depend:
+          prop_value = prop_array[prop_index]
+        else:
+          prop_value = prop_array[t_index][prop_index]
+        
+        prop_avg += wm_value * prop_value
       
       avg_array[t_index, mu_index] = prop_avg
 
   return success, error, avg_array
 
 def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
-                        experiment_cnts, permutations, _accuracy, options):
+                        experiment_cnts, permutations, omega_c_arr, _accuracy, options):
   """
   Performs the distribution analysis: evaluates Wm and plots it against m and mu.
   
@@ -103,7 +114,11 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   Graphs.wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
   # Performing analysis with respect to the distribution function (average m is the standard analysis)
-  average_analysis(temperatures, chem_pot_range, chem_pot_multi, "m", Wm_array, _accuracy, options)
+  # average m
+  average_analysis(temperatures, chem_pot_range, chem_pot_multi, "m", Wm_array, _accuracy, options, temp_depend=False)
+  
+  # average gamma
+  average_analysis(temperatures, chem_pot_range, omega_c_arr, "\gamma^{c}", Wm_array, _accuracy, options, temp_depend=True)
   
   return success, error, Wm_array
 

@@ -70,16 +70,16 @@ def c_gamma_analysis(chem_pot_multi, names, temperatures, min_energies, delta_E_
   log(__name__, "Omega analysis (canonical)", options.verbose, indent=2)
   
   # calculates omega values
-  success, error, omega_arr = c_calc_gamma(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
+  success, error, omega_c_arr = c_calc_gamma(temperatures, min_energies, delta_E_sums, experiment_cnts, permutations, 
                                            _accuracy, options)
   
   if not success:
     return success, error
   
   # plot omega with respect to temperature
-  Graphs.c_omega(chem_pot_multi, names, temperatures, omega_arr, _accuracy, options)
+  Graphs.c_omega(chem_pot_multi, names, temperatures, omega_c_arr, _accuracy, options)
 
-  return success, error
+  return success, error, omega_c_arr
 
 def g_c_calc_omega(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, experiment_cnts, 
                    permutations, _accuracy, options):

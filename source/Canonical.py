@@ -24,7 +24,7 @@ def perform_canonical_analysis(chem_pot_multi, names, permutations, temperatures
     return success, error
   
   # perform omega analysis
-  success, error, = OmegaAnalysis.c_gamma_analysis(chem_pot_multi, names, temperatures, min_energies, 
+  success, error, omega_c_arr = OmegaAnalysis.c_gamma_analysis(chem_pot_multi, names, temperatures, min_energies, 
                                                    delta_E_sums, experiment_cnts, permutations, _accuracy, options)
   
-  return success, error
+  return success, error, omega_c_arr
