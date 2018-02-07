@@ -1,8 +1,8 @@
-# Grand Canonical Ensemble (Grand C)
+# Grand Canonical Analysis Toolkit (GCAT)
 
 The work is based on the methodology developed in the following papers:
 
-Usage: GrandC.py input_data.csv
+Usage: GCAT.py input_data.csv
 
 Options:
   -h, --help          show this help message and exit

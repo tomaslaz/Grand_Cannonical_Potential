@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """
-@author Tomas Lazauskas, 2016-2017
+GCAT - Grand Canonical Analysis Toolkit
+
+@author Tomas Lazauskas, 2016-2018
 
 """
 
@@ -13,7 +15,7 @@ import source.IO as IO
 import source.GrandPotential as GrandPotential
 from source.Utilities import log
 
-_accuracy = np.float128
+_accuracy = np.longdouble
 
 def cmd_line_args():
   """

@@ -1,5 +1,5 @@
 """
-@author Tomas Lazauskas, 2017
+@author Tomas Lazauskas, 2018
 
 A module for plotting the results
 

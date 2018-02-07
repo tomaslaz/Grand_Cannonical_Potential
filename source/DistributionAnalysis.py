@@ -1,5 +1,5 @@
 """
-@author Tomas Lazauskas, 2017
+@author Tomas Lazauskas, 2017-2018
 
 A module to analyse distribution functions of different stoichiometries
 

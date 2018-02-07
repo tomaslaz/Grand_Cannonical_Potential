@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-@author Tomas Lazauskas, 2017
+@author Tomas Lazauskas, 2017-2018
 
 Canonical ensemble module.
 

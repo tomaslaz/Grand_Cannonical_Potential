@@ -1,5 +1,5 @@
 """
-@author Tomas Lazauskas, 2017
+@author Tomas Lazauskas, 2017-2018
 
 A module to calculate and analyse Omega (the grand potential)
 
@@ -48,10 +48,11 @@ def c_calc_gamma(temperatures, min_energies, delta_E_sums, experiment_cnts, perm
       
       # Nm
       Nm = experiment_cnts[c_index]
+            
+      #Z_cm = np.exp(-1.0*(min_energies[c_index]) / kT) * (Pm/Nm) * delta_E_sums[c_index][t_index]
+      #omega_value = - kT * np.log(Z_cm)
       
-      Z_cm = np.exp(-1.0*(min_energies[c_index]) / kT) * (Pm/Nm) * delta_E_sums[c_index][t_index]
-      
-      omega_value = - kT * np.log(Z_cm)
+      omega_value = - kT * (-1.0*(min_energies[c_index]) / kT + np.log((Pm/Nm)) + np.log(delta_E_sums[c_index][t_index]))
       
       omega_arr[t_index, c_index] = omega_value / Constants.gamma_c_m_coef
       
