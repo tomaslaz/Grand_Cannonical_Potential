@@ -20,30 +20,12 @@ def calc_permutation(m, mm, _accuracy):
   Evaluates the permutation expression
   
   """
-  
-  # This is a test case for YZrO system
-#   cat_sites = 108
-#   an_sites = 216
-#   
-#   up_fac = cat_sites - 2*m
-#   down_fac = cat_sites - 2*mm
-#   
-#   value = Utilities.factorial_division(up_fac, down_fac, _accuracy)
-#   
-#   value *= Utilities.factorial_division(2*m, 2*mm, _accuracy)
-#   
-#   up_fac = an_sites - m
-#   down_fac = an_sites - mm
-#   
-#   value *= Utilities.factorial_division(up_fac, down_fac, _accuracy)
-#   
-#   value *= Utilities.factorial_division(m, mm, _accuracy)
-  
+    
   value = 1
   
   return value
 
-def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
+def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options, temp_depend=False):
   """
   Performs average analysis on a selected property
   
@@ -51,7 +33,7 @@ def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_arr
   
   # Calculates the average values
   success, error, avg_array = calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, 
-                                                 Wm_array, _accuracy, options)
+                                                 Wm_array, _accuracy, options, temp_depend=temp_depend)
   
   if not success:
     return success, error
@@ -61,7 +43,7 @@ def average_analysis(temperatures, chem_pot_range, prop_array, prop_name, Wm_arr
   
   return success, error
 
-def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options):
+def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_array, _accuracy, options, temp_depend=False):
   """
   Calculates average value of a system's property
   
@@ -74,7 +56,12 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
     
   temp_len = len(temperatures)
   chem_pot_len = len(chem_pot_range)
-  prop_len = len(prop_array)
+  
+  # is the value temperature dependent
+  if not temp_depend:
+    prop_len = len(prop_array)
+  else:
+    prop_len = len(prop_array[0])
   
   avg_array = np.zeros([temp_len, chem_pot_len], _accuracy)
     
@@ -89,14 +76,20 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
       for prop_index in range(prop_len):
         wm_value = Wm_array[t_index, mu_index, prop_index]
         
-        prop_avg += wm_value * prop_array[prop_index]
+        # is the value temperature dependent
+        if not temp_depend:
+          prop_value = prop_array[prop_index]
+        else:
+          prop_value = prop_array[t_index][prop_index]
+        
+        prop_avg += wm_value * prop_value
       
       avg_array[t_index, mu_index] = prop_avg
 
   return success, error, avg_array
 
 def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
-                        experiment_cnts, permutations, _accuracy, options):
+                        experiment_cnts, permutations, omega_c_arr, _accuracy, options):
   """
   Performs the distribution analysis: evaluates Wm and plots it against m and mu.
   
@@ -121,7 +114,11 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
   Graphs.wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
   # Performing analysis with respect to the distribution function (average m is the standard analysis)
-  average_analysis(temperatures, chem_pot_range, chem_pot_multi, "m", Wm_array, _accuracy, options)
+  # average m
+  average_analysis(temperatures, chem_pot_range, chem_pot_multi, "m", Wm_array, _accuracy, options, temp_depend=False)
+  
+  # average gamma
+  average_analysis(temperatures, chem_pot_range, omega_c_arr, "\gamma^{c}", Wm_array, _accuracy, options, temp_depend=True)
   
   return success, error, Wm_array
 
@@ -153,6 +150,7 @@ def distribution_analysis_canonical(temperatures, experiment_cnts, shifted_energ
       for exp_i in range(experiment_cnts[comp_i]):
                 
         exp_expr_pow = -1.0 * shifted_energies[comp_i][exp_i] / kT
+        
         Wm_array[t_i, comp_i, exp_i] = np.exp(exp_expr_pow) / delta_E_sums[comp_i, t_i]
   
   return success, error, Wm_array
@@ -189,26 +187,16 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
         
         # Estimating the bottom part of Wm
         sum_bottom = _accuracy(0.0)
-        
-        # Calculating exponential terms powers
-        exp_powers = np.empty(chem_pot_multi_len, _accuracy)
-        
-        for mm_index in range(chem_pot_multi_len):
-          mm_value = chem_pot_multi[mm_index]
-          Emin_mm = min_energies[mm_index]
-          
-          # the power of the exponential term
-          exp_powers[mm_index] = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
-        
+                
         breakLoops = False
-        
+  
         for mm_index in range(chem_pot_multi_len):
 
           mm_value = chem_pot_multi[mm_index]
           Emin_mm = min_energies[mm_index]
           
           # exponential term
-          exp_expr_pow = exp_powers[mm_index]
+          exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
                       
           if (exp_expr_pow > Constants.BIGEXPO):
             # the value of the exponential power is too damn high
@@ -227,10 +215,10 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           if options.permCalc:
             permutation = _accuracy(calc_permutation(m_value, mm_value, _accuracy))
           else:
-            permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))         
-          
-          sum_bottom += exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i]
+            permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))
             
+          sum_bottom += (exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i])
+          
         if not breakLoops:
            
           if sum_bottom == 0.0:
@@ -241,7 +229,7 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           Wm_sum += Wm_value
         else:
           Wm_value = 0
-         
+        
         Wm_array[t_i, mu_i, m_index] = Wm_value
        
       # Normalising
