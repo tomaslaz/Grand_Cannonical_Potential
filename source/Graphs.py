@@ -178,3 +178,5 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
     # clearing the figure settings   
     plt.clf()
     plt.close()
+    
+  return
