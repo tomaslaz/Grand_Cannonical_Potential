@@ -125,7 +125,7 @@ def c_omega(chem_pot_multi, names, temperatures, omega_arr, _accuracy, options):
   plt.clf()
   plt.close()
 
-def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
+def wm_contour(temperatures, names, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options):
   """
   Plots distribution functions in terms of m and mu with respect to the temperature
   
@@ -153,7 +153,7 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
 
     Z = Wm_array[t_i, :, :]
   
-    contour_filled = plt.contourf(X, Y, Z, levels, cmap=cmap, interpolation='bilinear', vmax=1.1, vmin=0.0, alpha=0.95)
+    contour_filled = plt.contourf(Y, X, Z, levels, cmap=cmap, vmax=1.1, vmin=0.0, alpha=0.95)
     
     cbar = plt.colorbar(contour_filled, ticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
     cbar.ax.tick_params(labelsize=16) 
@@ -161,9 +161,13 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
       
     for tick in cbar.ax.yaxis.get_major_ticks():
       tick.label.set_fontsize(16) 
-      
-    plt.xlabel(r'$m$', fontsize = Constants.fig_label_fontsize)
-    plt.ylabel(r'$\mu$', fontsize = Constants.fig_label_fontsize)
+    
+    # x axis ticklabels
+    plt.yticks(chem_pot_multi, names, fontsize = Constants.fig_legend_fontsize) # rotation=30, 
+    
+    plt.xlabel(r'$\mu$', fontsize = Constants.fig_label_fontsize) 
+    plt.ylabel(r'$m$', fontsize = Constants.fig_label_fontsize)
+   
     plt.title("T = %d K" % (temperature), fontsize = Constants.fig_legend_fontsize)
     
     ax = plt.gca()
@@ -172,6 +176,8 @@ def wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy
       
     for tick in ax.yaxis.get_major_ticks():
       tick.label.set_fontsize(16)
+    
+    plt.grid()
     
     fig.savefig(file_name+".png", dpi=Constants.fig_dpi, bbox_inches='tight')
          

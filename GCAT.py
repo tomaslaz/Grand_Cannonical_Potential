@@ -74,7 +74,7 @@ def main(options, args):
   if success and chem_pot_range is not None:
     # grand canonical analysis
     log(__name__, "Performing the grand canonical analysis", options.verbose, indent=1)
-    success, error = GrandPotential.perform_grand_canonical_analysis(permutations, chem_pot_multi, temperatures, 
+    success, error = GrandPotential.perform_grand_canonical_analysis(permutations, chem_pot_multi, names, temperatures, 
                                                                      chem_pot_range, min_energies, delta_E_sums, 
                                                                      experiment_cnts, omega_c_arr, _accuracy, options)
   

@@ -88,7 +88,7 @@ def calc_average_value(temperatures, chem_pot_range, prop_array, prop_name, Wm_a
 
   return success, error, avg_array
 
-def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta_E_sums, 
+def distribution_analysis(chem_pot_multi, names, temperatures, chem_pot_range, min_energies, delta_E_sums, 
                         experiment_cnts, permutations, omega_c_arr, _accuracy, options):
   """
   Performs the distribution analysis: evaluates Wm and plots it against m and mu.
@@ -111,7 +111,7 @@ def distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, min_ener
     return success, error, Wm_array
   
   # Plotting the Wm probabilities 3D plots
-  Graphs.wm_contour(temperatures, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
+  Graphs.wm_contour(temperatures, names, chem_pot_range, chem_pot_multi, Wm_array, _accuracy, options)
   
   # Performing analysis with respect to the distribution function (average m is the standard analysis)
   # average m
@@ -195,18 +195,21 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           mm_value = chem_pot_multi[mm_index]
           Emin_mm = min_energies[mm_index]
           
-          # exponential term
-          exp_expr_pow = _accuracy(((Emin_m - Emin_mm) + mu*(m_value - mm_value))/kT)
+          # exponential terms
+          
+          temp_expr1 = (Emin_m - Emin_mm)
+          #temp_expr1 = np.abs((Emin_m - Emin_mm))
+          
+          temp_expr2 = mu*(m_value - mm_value)
+          #temp_expr2 = np.abs(mu*(m_value - mm_value))
+          
+          exp_expr_pow = _accuracy((temp_expr1 - temp_expr2)/kT)
                       
-          if (exp_expr_pow > Constants.BIGEXPO):
-            # the value of the exponential power is too damn high
-            breakLoops = True              
-            break
-
+          if (exp_expr_pow > Constants.BIGEXPO):            
+            exp_expr = Utilities.approximate_exp(exp_expr_pow, _accuracy)
+            
           else:
             exp_expr = _accuracy(np.exp(exp_expr_pow))
-          
-          exp_expr = _accuracy(np.exp(exp_expr_pow))
           
           # Nm/Nmm
           attempts_cnt = experiment_cnts[m_index] / experiment_cnts[mm_index] 
@@ -217,7 +220,7 @@ def prepare_Wm(chem_pot_multi, temperatures, chem_pot_range, min_energies, delta
           else:
             permutation = _accuracy(_accuracy(permutations[mm_index])/_accuracy(permutations[m_index]))
             
-          sum_bottom += (exp_expr * attempts_cnt * permutation * delta_E_sums[mm_index][t_i])
+          sum_bottom += (((attempts_cnt * delta_E_sums[mm_index][t_i]) * permutation) * exp_expr)
           
         if not breakLoops:
            

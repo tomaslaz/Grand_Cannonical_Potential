@@ -10,7 +10,7 @@ fig_label_fontsize = 18
 fig_legend_fontsize = 14
 fig_ticklabel_fontsize = 10
 
-BIGEXPO = 1000
+BIGEXPO = 100
 
 # canonical analysis
 gamma_c_m_coef = 32

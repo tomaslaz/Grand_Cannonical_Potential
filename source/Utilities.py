@@ -6,6 +6,36 @@ Utilities module.
 
 import datetime
 import numpy as np
+import warnings
+
+def approximate_exp(power, _accuracy):
+  """
+  Approximates exponential with a very high power
+  
+  """
+  
+  devider = 100
+  
+  result = _accuracy(0.0)
+  
+  exp_dev_cnt = power / devider
+  exp_remain = power % devider
+  
+  exp_result = np.exp(_accuracy(exp_remain))
+  
+  exp_dev = np.exp(_accuracy(devider))
+  
+  warnings.filterwarnings("error")
+  
+  for i in range(exp_dev_cnt):
+    try:
+      exp_result *= exp_dev
+
+    except:
+      exp_result = np.inf
+      break
+    
+  return exp_result
 
 def frange(x, y, jump):
   frange_arr = []

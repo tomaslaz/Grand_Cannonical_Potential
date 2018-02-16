@@ -16,7 +16,7 @@ import OmegaAnalysis
 
 from Utilities import log
   
-def perform_grand_canonical_analysis(permutations, chem_pot_multi, temperatures, chem_pot_range, 
+def perform_grand_canonical_analysis(permutations, chem_pot_multi, names, temperatures, chem_pot_range, 
                                      min_energies, delta_E_sums, experiment_cnts, omega_c_arr, 
                                      _accuracy, options):
   """
@@ -24,7 +24,7 @@ def perform_grand_canonical_analysis(permutations, chem_pot_multi, temperatures,
   
   """
     
-  success, error, Wm_array = DistributionAnalysis.distribution_analysis(chem_pot_multi, temperatures, chem_pot_range, 
+  success, error, Wm_array = DistributionAnalysis.distribution_analysis(chem_pot_multi, names, temperatures, chem_pot_range, 
                                          min_energies, delta_E_sums, experiment_cnts, permutations, omega_c_arr, 
                                          _accuracy, options)
   
